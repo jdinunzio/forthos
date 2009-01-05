@@ -1,0 +1,5 @@
+*.o
+kernel
+test
+z-jonesforth/
+z-origos/

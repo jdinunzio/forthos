@@ -1,0 +1,215 @@
+; myforth: My own forth system.
+; This is a translation of jonesforth 
+; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm
+
+[BITS 32]
+; ============================================================================
+;    Forth Macros
+; ============================================================================
+; These macros are defined to facilitate the task of write forth words in
+; assembler. 
+
+
+; NEXT macro
+;   Executes the next forth word.
+;   esi points to the codeword of the next word to be executed. The 
+;   codeword stores the address of the rutine that implements the forth word.
+;   Increments esi to point to the next forth word, and jumps to the rutine.
+%macro NEXT 0
+            lodsd
+            jmp [eax]
+%endmacro
+
+
+; PUSHRSP and POPRSP
+;   push and pop in the return stack 
+%macro PUSHRSP 1
+            lea ebp, [ebp-4]
+            mov [ebp], %1
+%endmacro
+
+%macro POPRSP 1
+            mov %1, [ebp]
+            lea ebp, [ebp+4]
+%endmacro
+
+
+; defword macro
+;   Define a forth word implemented in forth.
+;
+;   A forth word is a serie of pointers to the codewords that implement it.
+;   A forth word must end with the EXIT word.
+;
+;   ARGS: name, label, flags
+%macro defword 3
+    section .rodata                 ; Define this word in the rodata
+            align 4                 ;   section, aligned and with a 
+            GLOBAL label_%2         ;   global name
+            %defstr name %1         ; Set the name and length of this
+            %strlen name_len name   ;   word
+            %undef OLDLINK          ; Updates OLDLINK and LINK to
+            %xdefine OLDLINK LINK   ;   link this word with the
+            %undef LINK             ;   previous one
+            %xdefine LINK name_%2   ;
+    name_%2:
+            dd  OLDLINK             ; LINK to the previous word
+            db %3 + name_len        ; Flags + len(name)
+            db name                 ; Name of the word
+
+            align 4                 ; Start the definition in a 4 bytes
+            GLOBAL %2               ;   boundary
+    %2:
+            dd DOCOL                ; codeword of this word
+%endmacro
+
+
+; defcode macro
+;   Define a forth word implemented in assembler.
+;
+;   The body of a code word is an assebler routine. The routine must end
+;   with the NEXT macro to make the forth interpreter execute the next
+;   operation.
+;
+;   ARGS: name, label, flags
+%macro defcode 3
+    section .rodata                 ; Define this word in the rodata
+            align 4                 ;   section, aligned y with a 
+            GLOBAL name_%2          ;   global name
+            %defstr name %1         ; Set the name and length of this
+            %strlen name_len name   ;   word
+            %undef OLDLINK          ; Updates OLDLINK and LINK to
+            %xdefine OLDLINK LINK   ;   link this word with the
+            %undef LINK             ;   previous one
+            %xdefine LINK name_%2   ;
+    name_%2:
+            dd  LINK                ; Links to the previous word
+            db %3 + name_len        ; Flags + len(name)
+            db name                 ; Name of the word
+
+            align 4                 ; Start the definition in a 4 bytes
+            GLOBAL %2               ;   boundary
+    %2:
+            dd code_%2              ; codeword of this word
+    section .text                   ; Here starts the assembler for this
+            align 4                 ;   word
+            GLOBAL code_%2          ;
+    code_%2:
+%endmacro
+
+
+; defvar macro
+;   Define a variable.
+;
+;   A variable word is a code word that pushes in the stack the address of the 
+;   variable.
+;
+;   ARGS: name, label, flags, value
+%macro defvar 4
+            defcode %1, %2, %3
+            push var_%2
+            NEXT
+    section .data
+            align 4
+    var_%2:
+            dd %4
+%endmacro
+
+
+; defconst macro
+;   Define a constant.
+;
+;   A constant word is a code word that push in the stack a constant value.
+;
+;   ARGS: name, label, flags, value
+%macro defconst 4
+            defcode %1, %2, %3
+            push %4
+            NEXT
+%endmacro
+
+; Literal value
+%macro LITN 1
+            dd LIT
+            dd %1
+%endmacro
+
+
+; convenience macros
+%macro branch 1
+        dd BRANCH 
+        dd %1 - $
+%endmacro
+
+%macro zbranch 1
+        dd ZBRANCH 
+        dd %1 - $
+%endmacro
+
+; cond IF ... ELSE ... THEN
+%macro if 0
+        %push if_cond
+        zbranch %$ifnot
+%endmacro
+
+%macro else 0
+        %repl else_cond
+        branch %$exit
+    %$ifnot:
+%endmacro
+
+%macro then 0
+        %ifctx if_cond
+            %$ifnot:
+        %endif
+    %$exit:
+        %pop
+%endmacro
+
+
+; end ini DO ... LOOP
+%macro do 0
+        %push do_loop
+    %$loop:
+        dd TWODUP
+        dd GE
+        zbranch %$exit
+%endmacro
+
+%macro loop 0
+        dd INCR
+        branch %$loop
+    %$exit:
+        dd DROP, DROP
+        %pop
+%endmacro
+
+
+; BEGIN ... cond UNTIL
+%macro begin 0
+        %push begin_loop
+    %$loop:
+%endmacro
+
+%macro until 0
+        zbranch %$loop
+    %$exit:
+        %pop
+%endmacro
+
+
+; BEGIN cond WHILE ... REPEAT
+%macro while 0
+        zbranch %$exit
+%endmacro
+
+%macro repeat 0
+        branch %$loop
+    %$exit:
+        %pop
+%endmacro
+
+; You can always exit from a loop with LEAVE
+%macro leave 0
+        branch %$exit
+        %pop
+%endmacro
