@@ -1,7 +1,7 @@
 ; myforth: My own forth system.
 ; This is a translation of jonesforth 
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm
-
+; Bug in defcode macro corrected . august0815 14.12.2009
 [BITS 32]
 ; ============================================================================
 ;    Forth Macros
@@ -82,7 +82,7 @@
             %undef LINK             ;   previous one
             %xdefine LINK name_%2   ;
     name_%2:
-            dd  LINK                ; Links to the previous word
+            dd  OLDLINK             ; Links to the previous word
             db %3 + name_len        ; Flags + len(name)
             db name                 ; Name of the word
 
