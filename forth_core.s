@@ -1,5 +1,9 @@
+; program: forth_core
+;
 ; myforth: My own forth system.
+;
 ; This is a translation of jonesforth 
+;
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm
 
 %ifndef forth_core
@@ -57,36 +61,47 @@
             F_LENMASK  equ  0x1f    ;
             %define LINK 0          ; Address of the las header word
 
-; Virtual Machine variables
-;   STATE       Is the interpreter executing code (0) or compiling (non-zero)?
-;   LATEST      Points to the newset  word in the dictionary.
-;   HERE        Points to the next free byte of memory.
-;   S0          Stores the address of the top of the parameter stack.
-;   BASE        The current base for printing and reading numbers.
+;  Virtual Machine variables
+
+; var: STATE       Is the interpreter executing code (0) or compiling (non-zero)?
+
+; var LATEST      Points to the newset  word in the dictionary.
+
+; var: HERE        Points to the next free byte of memory.
+
+; var: S0          Stores the address of the top of the parameter stack.
+
+; var: BASE        The current base for printing and reading numbers.
 
             defvar STATE, STATE, 0, 0
             defvar HERE, HERE, 0, 0
-            defvar LATEST, LATEST, 0, 0 ; SYSCALL0 must be last in built-in dictionary
+            defvar LATEST, LATEST, 0, wel ; SYSCALL0 must be last in built-in dictionary
             defvar S0, S0, 0, 0
             defvar BASE, BASE, 0, 10
 
-; Virtual Machine constants
-;    VERSION     Is the current version of this FORTH.
-;    R0          The address of the top of the return stack.
-;    DOCOL       Pointer to DOCOL.
-;    F_IMMED     The IMMEDIATE flag's actual value.
-;    F_HIDDEN    The HIDDEN flag's actual value.
-;    F_LENMASK   The length mask in the flags/len byte.
+;  Virtual Machine constants
+; const: VERSION     Is the current version of this FORTH.
+
+; const: R0          The address of the top of the return stack.
+
+; const: DOCOL       Pointer to DOCOL.
+
+; const: F_IMMED     The IMMEDIATE flag's actual value.
+
+; const: F_HIDDEN    The HIDDEN flag's actual value.
+
+; const: F_LENMASK   The length mask in the flags/len byte.
+
 
             defconst VERSION, VERSION, 0, 1
             defconst R0, R0, 0, 2
             defconst DOCOL, __DOCOL, 0, DOCOL
-            defconst F_IMMED, __F_IMMED, 0, F_IMMED
-            defconst F_HIDDEN, __F_HIDDEN, 0, F_HIDDEN
-            defconst F_LENMASK, __F_LENMASK, 0, F_LENMASK
+            defconst F_IMMED, __F_IMMED, 0, 0x80
+            defconst F_HIDDEN, __F_HIDDEN, 0, 0x20
+            defconst F_LENMASK, __F_LENMASK, 0, 0x1f
 
 
-; DOCOL
+; defcode: DOCOL
 ;   This is the core of the forth virtual machine. This routine executes the
 ;   non-native words. A non-native word is formed by a serie of pointers to the 
 ;   codewords of other forth words. DOCOL executes each one of these codewords.
@@ -98,7 +113,7 @@ DOCOL:
             mov esi, eax        ;   now esi points to the first word
             NEXT
 
-; defcode EXIT
+; defcode: EXIT
 ;   EXIT is the last word of a forth word (a non-defcode word). It restores the 
 ;   value of esi, stored in the return stack by DOCOL when this word started.
 defcode EXIT, EXIT, 0
