@@ -1,7 +1,6 @@
-
 ; file: ex
 ; by august0815
-; 19.12.2010
+; 19.12.2009
 
 ; TODO clean up 
 ;
