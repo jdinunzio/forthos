@@ -1,7 +1,7 @@
 
-; file: extentions_1 
+; file: ext1
 ; by august0815
-; 19.12.2010
+; 19.12.2009
 
 
 ;;;;;;;;;;;;;; SOME WORDS

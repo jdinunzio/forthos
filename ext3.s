@@ -1,5 +1,5 @@
 
-; file: ext
+; file: ext3
 ; by august0815
 ; 01.12.2009
 
@@ -62,7 +62,7 @@ defword VARIABLE,VARIABLE,0
 	
   
 
-;defword DEPTH	NOT TESTED_OK
+;defword DEPTH	  NOT TESTED_OK
 ;( DEPTH returns the depth of the stack. )
 ;: DEPTH		( -- n )
 ;	S0 @ DSP@ -
