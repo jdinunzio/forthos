@@ -1,5 +1,5 @@
 
-; file: ext2 
+; file: ext2
 ; by august0815
 ; 19.12.2009
 
@@ -175,9 +175,8 @@ defword UWIDTH,UWIDTH,0
 ;	ELSE
 ;		1		( return 1 )
 ;	THEN
-	dd BASE , FETCH 
+    dd BASE , FETCH 
 	dd DIV
-	;
 	dd QDUP
 	if
 		dd UWIDTH , INCR
@@ -246,19 +245,16 @@ defword DR,DOTR,0
 	if
 		dd NEGATE 
 		LITN 1
-		dd SWAP ,ROT , DECR
+		dd SWAP 
+		dd ROT
 	else
-		LITN 0
-		dd SWAP , ROT
+		 LITN 0
+		 dd SWAP 
+		dd  ROT
 	then
 	dd SWAP 
-	dd DUP , UWIDTH 
-	dd ROT
-	dd SWAP 
-	dd SUB 
-	dd 	SPACES , SWAP
-	dd DUP
-	dd ZLT
+	dd DROP
+	dd ZNEQU
 	if
 		LITN '-'
 		dd EMIT
@@ -274,8 +270,8 @@ defword DR,DOTR,0
 defword . , DOT ,0
 ;( Finally we can define word . in terms of .R, with a trailing space. )
 ;: . 0 .R SPACE ;
-dd DOTS ,CR
 	LITN 0 
+	dd DOTR , SPACE
 	dd EXIT		; EXIT		(return from FORTH word)
 ; The real U., note the trailing space. ) 
 ;: U. U. SPACE ;	??
