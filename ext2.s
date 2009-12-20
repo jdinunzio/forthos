@@ -1,5 +1,5 @@
 
-; file: extentions_2 
+; file: ext2 
 ; by august0815
 ; 19.12.2009
 
