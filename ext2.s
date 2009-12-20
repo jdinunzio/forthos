@@ -1,5 +1,5 @@
 
-; file: ext2
+; file: extentions_2 
 ; by august0815
 ; 19.12.2009
 
@@ -175,7 +175,9 @@ defword UWIDTH,UWIDTH,0
 ;	ELSE
 ;		1		( return 1 )
 ;	THEN
-	dd BASE , FETCH , DIV
+	dd BASE , FETCH 
+	dd DIV
+	;
 	dd QDUP
 	if
 		dd UWIDTH , INCR
@@ -186,8 +188,8 @@ defword UWIDTH,UWIDTH,0
 
 
 
-; defword: U.R ; NOT TESTED_OK
-defword U.R,UDOTR,0
+; defword: UR ; NOT TESTED_OK
+defword UR,UDOTR,0
 ;: U.R		( u width -- )
 ;	SWAP		( width u )
 ;	DUP		( width u u )
@@ -205,8 +207,8 @@ defword U.R,UDOTR,0
 	dd UDOT
 dd EXIT		; EXIT		(return from FORTH word)
 
-; defword: U.R ; NOT TESTED_OK
-defword .R,DOTR,0
+; defword: .R ; NOT TESTED_OK , fehler bei negativen ZAHLEN
+defword DR,DOTR,0
 ;(
 ;	.R prints a signed number, padded to a certain width.  We can't just print the sign
 ;	and call U.R because we want the sign to be next to the number ('-123' instead of '-  123').
@@ -238,7 +240,8 @@ defword .R,DOTR,0
 ;	THEN
 ;
 ;	U.
-	dd SWAP ,DUP
+	dd SWAP 
+	dd DUP
 	dd ZLT
 	if
 		dd NEGATE 
@@ -248,21 +251,31 @@ defword .R,DOTR,0
 		LITN 0
 		dd SWAP , ROT
 	then
-	dd SWAP , DUP , UWIDTH , ROT , SWAP , SUB , SPACES , SWAP
+	dd SWAP 
+	dd DUP , UWIDTH 
+	dd ROT
+	dd SWAP 
+	dd SUB 
+	dd 	SPACES , SWAP
+	dd DUP
+	dd ZLT
 	if
 		LITN '-'
+		dd EMIT
+	else
+		LITN '+'
 		dd EMIT
 	then
 	dd UDOT
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-; defword: . ; NOT TESTED_OK
+; defword: DT ; NOT TESTED_OK
 defword . , DOT ,0
 ;( Finally we can define word . in terms of .R, with a trailing space. )
 ;: . 0 .R SPACE ;
+dd DOTS ,CR
 	LITN 0 
-	dd DOTR ,SPACE 
 	dd EXIT		; EXIT		(return from FORTH word)
 ; The real U., note the trailing space. ) 
 ;: U. U. SPACE ;	??
@@ -324,4 +337,68 @@ defword ALI , ALI ,0
 	dd HERE , STORE
 	dd EXIT		; EXIT		(return from FORTH word)
 	
+; defword: C, ; NOT TESTED_OK rename !!!
+;( C, appends a byte to the current compiled word. )
+defword CK, CKOMMA ,0
+;: C,
+;	HERE @ C!	( store the character in the compiled image )
+;	1 HERE +!	( increment HERE pointer by 1 byte )
+
+	dd EXIT		; EXIT		(return from FORTH word)
+
+; defword: SAP ; NOT TESTED_OK rename !!!
+defword SAP, SAP ,0
+;: S" IMMEDIATE		( -- addr len )
+;	STATE @ IF	( compiling? )
+;		' LITSTRING ,	( compile LITSTRING )
+;		HERE @		( save the address of the length word on the stack )
+;		0 ,		( dummy length - we don't know what it is yet )
+;		BEGIN
+;			KEY 		( get next character of the string )
+;			DUP '"' <>
+;		WHILE
+;			C,		( copy character )
+;		REPEAT
+;		DROP		( drop the double quote character at the end )
+;		DUP		( get the saved address of the length word )
+;		HERE @ SWAP -	( calculate the length )
+;		4-		( subtract 4 (because we measured from the start of the length word) )
+;		SWAP !		( and back-fill the length location )
+;		ALIGN		( round up to next multiple of 4 bytes for the remaining code )
+;	ELSE		( immediate mode )
+;		HERE @		( get the start address of the temporary space )
+;		BEGIN
+;			KEY
+;			DUP '"' <>
+;		WHILE
+;			OVER C!		( save next character )
+;			1+		( increment address )
+;		REPEAT
+;		DROP		( drop the final " character )
+;		HERE @ -	( calculate the length )
+;		HERE @		( push the start address )
+;		SWAP 		( addr len )
+;	THEN
+	dd EXIT		; EXIT		(return from FORTH word)
+	
+; defword: .AP ; NOT TESTED_OK rename !!!	
+defword .AP, DOTAP ,0
+;: ." IMMEDIATE		( -- )
+;	STATE @ IF	( compiling? )
+;		[COMPILE] S"	( read the string, and compile LITSTRING, etc. )
+;		' TELL ,	( compile the final TELL )
+;	ELSE
+;		( In immediate mode, just read characters and print them until we get
+;		  to the ending double quote. )
+;		BEGIN
+;			KEY
+;			DUP '"' = IF
+;				DROP	( drop the double quote character )
+;				EXIT	( return from this function )
+;			THEN
+;			EMIT
+;		AGAIN
+;	THEN
+	dd EXIT		; EXIT		(return from FORTH word)
+
 %include "ext3.s"

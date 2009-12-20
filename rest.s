@@ -136,12 +136,103 @@ inter:	    dd INTERPRET
 next:		dd CR
  			dd CR
             dd PRESSKEY
+            LITN 0
+            dd DUP
+			dd TST , STORE  ;clear Error_flag
+            dd TST1 , STORE ;clear End_of_Line flag
             LITN zeile_buffer
+            
 			dd PPTR , STORE
             dd CLEAR
             dd CLSSTACK
             dd DROP
  			dd EXIT		; EXIT		(return from FORTH word)
+
+; defword: DUMP   NOT TESTED_OK
+defword DUMP , DUMP ,0
+;: DUMP		( addr len -- )
+;	BASE @ -ROT		( save the current BASE at the bottom of the stack )
+;	HEX			( and switch to hexadecimal mode )
+;	BEGIN
+;		?DUP		( while len > 0 )
+;	WHILE
+;		OVER 8 U.R	( print the address )
+;		SPACE		( print up to 16 words on this line )
+;		2DUP		( addr len addr len )
+;		1- 15 AND 1+	( addr len addr linelen )
+;		BEGIN
+;			?DUP		( while linelen > 0 )
+;		WHILE
+;			SWAP		( addr len linelen addr )
+;			DUP C@		( addr len linelen addr byte )
+;			2 .R SPACE	( print the byte )
+;			1+ SWAP 1-	( addr len linelen addr -- addr len addr+1 linelen-1 )
+;		REPEAT
+;		DROP		( addr len )
+;		( print the ASCII equivalents )
+;		2DUP 1- 15 AND 1+ ( addr len addr linelen )
+;		BEGIN
+;			?DUP		( while linelen > 0)
+	;	WHILE
+;			SWAP		( addr len linelen addr )
+;			DUP C@		( addr len linelen addr byte )
+;			DUP 32 128 WITHIN IF	( 32 <= c < 128? )
+;				EMIT
+;			ELSE
+;				DROP '.' EMIT
+;			THEN
+;			1+ SWAP 1-	( addr len linelen addr -- addr len addr+1 linelen-1 )
+;		REPEAT
+;		DROP		( addr len )
+;		CR
+;		DUP 1- 15 AND 1+ ( addr len linelen )
+;		TUCK		( addr linelen len linelen )
+;		-		( addr linelen len-linelen )
+;		>R + R>		( addr+linelen len-linelen )
+;	REPEAT
+;	DROP			( restore stack )
+;	BASE !			( restore saved BASE )
+	dd BASE ,FETCH, NROT , HEX
+	begin
+		dd QDUP
+	while
+		dd OVER 
+		LITN 8 
+		dd UDOTR ,SPACE , TWODUP , DECR
+		LITN 15 
+		dd AND ,INCR
+		begin
+			dd QDUP
+		while
+			dd SWAP ,DUP ,FETCHBYTE
+			LITN 2 
+			dd DOTR ,SPACE ,INCR ,SWAP , DECR
+		repeat
+		dd DROP , TWODUP , INCR 
+		LITN 15 
+		dd AND ,INCR
+		begin
+			dd QDUP
+		while
+			dd SWAP ,DUP 
+			LITN 32 
+			LITN 128
+			dd WITHIN
+			if 
+				dd EMIT
+			else
+				LITN '.'
+				dd EMIT
+			then
+			dd INCR,SWAP ,DECR
+		repeat
+		dd DROP ,CR ,DUP ,DECR 
+		LITN 15 
+		dd AND , INCR ,TUCK , SUB ,TOR ,ADD , FROMR
+	repeat
+	dd DROP
+	dd BASE ,STORE
+dd EXIT		; EXIT		(return from FORTH word)
 
 ; defword: WELCOME must be the LAST WORD !! LATEST points here <==
 wel:
