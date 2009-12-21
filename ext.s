@@ -1,3 +1,4 @@
+
 ; file: ext
 ; by august0815
 ; 19.12.2009
@@ -10,7 +11,7 @@ ASC     EQU     ']'
 CW      EQU     4 
 D_HOFFSET EQU     1
 
-; defcode: KEY
+; defcode: KEY  NOT_TESTED_NOT_USED
 defcode KEY,KEY,0
 	call	 _KEY
 	push	eax		;// push return value on stack
@@ -54,7 +55,7 @@ bufftop:
 
 
 
-; defcode: TWORD   (rename later to WORD?)
+; defcode: TWORD   (rename later to WORD?) NOT_TESTED_NOT_USED
 defcode TWORD , TRWORD , 0
 	call	 _WORD
 	push	edi	;	// push base address
@@ -95,7 +96,7 @@ section .data
 word_buffer: times 256 db 0
 
 
-; defcode: ZEILE  ; einlesen einer Zeile bis CR
+; defcode: ZEILE  ; einlesen einer Zeile bis CR   TESTED_OK
 ;
 ; edi  push base address
 ; ecx		 push length
@@ -154,7 +155,7 @@ rubout:
         pop     eax
 	ret	
 	
-; defcode:  NUMBER  OK
+; defcode:  NUMBER  TESTED_OK
 ;
 ; IN : ecx 	 length of string
 ;
@@ -215,7 +216,7 @@ _NUMBER:
 .5:	ret
 
 
-; defcode: FIND
+; defcode: FIND   TESTED_OK
 ;
 ; IN: ecx = length
 ; edi = address
@@ -263,7 +264,7 @@ _FIND:
 
 
 
-; defcode: ">CFA"
+; defcode: ">CFA"  TESTED_OK
 	defcode >CFA,TCFA,0
 	pop edi
 	call _TCFA
@@ -323,15 +324,16 @@ defcode CREATE, CREATE, 0
 _COMMA:
     
 	mov edi,[var_HERE]	; HERE
-	stosd			; Store it.
+	stosb			; Store it.
+	mov dword [var_HERE],edi,	; HERE
 	ret
 
-; defcode: [
+; defcode: [   TESTED_OK
 defcode [ ,LBRAC,F_IMMED ;;F_IMMED,LBRAC,0
 	xor eax,eax
 	mov dword [var_STATE],eax	; Set STATE to 0.
 	NEXT
-; defcode ]	
+; defcode ]	   TESTED_OK
 	defcode ],RBRAC,0
 	mov dword [var_STATE],1	; Set STATE to 1.
 	NEXT
@@ -531,12 +533,16 @@ ptr_buff: times 256 db 0
 	test edx,edx
 	jz .4			; Jump if executing.
 	; Compiling - just append the word to the current dictionary definition.
-	call _COMMA
+	mov edi,[var_HERE]	; HERE
+	stosb			; Store it.
+	mov dword [var_HERE],edi,	; HERE
 	mov ecx,[interpret_is_lit] ; Was it a literal?
 	test ecx,ecx
 	jz .3
 	mov eax,ebx		; Yes, so LIT is followed by a number.
-	call _COMMA
+	mov edi,[var_HERE]	; HERE
+	stosb			; Store it.
+	mov dword [var_HERE],edi,	; HERE
 .3:	NEXT
 
 .4:	; Executing - run it!
