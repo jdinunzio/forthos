@@ -176,7 +176,10 @@ defword DUMP , DUMP ,0
 	;	WHILE
 ;			SWAP		( addr len linelen addr )
 ;			DUP C@		( addr len linelen addr byte )
-;			DUP 32 128 WITHIN IF	( 32 <= c < 128? )
+;			DUP 32 128 WITHIN
+;          ( b   a  c	)		
+; 			IF	( 32 <= c < 128? )
+
 ;				EMIT
 ;			ELSE
 ;				DROP '.' EMIT
@@ -214,7 +217,7 @@ defword DUMP , DUMP ,0
 		begin
 			dd QDUP
 		while
-			dd SWAP ,DUP 
+			dd SWAP ,DUP ,FETCHBYTE ,DUP 
 			LITN 32 
 			LITN 128
 			dd WITHIN
@@ -226,9 +229,11 @@ defword DUMP , DUMP ,0
 			then
 			dd INCR,SWAP ,DECR
 		repeat
+		dd CR
 		dd DROP ,CR ,DUP ,DECR 
 		LITN 15 
 		dd AND , INCR ,TUCK , SUB ,TOR ,ADD , FROMR
+		dd CR
 	repeat
 	dd DROP
 	dd BASE ,STORE
@@ -263,5 +268,8 @@ defword WELCOM , WELCOM ,0
  			dd EXIT		; EXIT		(return from FORTH word)  
  			 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; no defcode or defword afther this line
+; no defcode or defword afther this line only for testing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+%include "test.s"

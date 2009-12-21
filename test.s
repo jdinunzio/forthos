@@ -1,60 +1,63 @@
-%include "forth_words.s"
 
-defconst SCREEN, SCREEN, 0, screenbuffer
-
-%include "kernel_video.s"
-
-[BITS 32]
-section .text
-GLOBAL start
-GLOBAL _start
-_start:
-start:
-            mov ebp, return_stack_top   ; init the return stack
-            mov esi, test               ; first foth word to exec
-            NEXT                        ;
-
-; Forth Entry point
-section .rodata
-test:
-
-test_at_hw:
-            dd CURSOR_POS_REL
-            dd AT_HW
-            dd SYS_EXIT
-
-
-test_printcstring:
-            LITN hola
-            dd PRINTCSTRING
-            dd SYS_EXIT
-            section .data
-hola:       db 'hola, mundo', 0
+defword test , test ,0
+      ;--------TESTING words------------------
+      ;********WITHIN****OK*******************
+      ;( c a b WITHIN returns true if a <= c and c < b )
+      LITN 5    ; b
+      LITN 10   ; a
+      LITN 30   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+       dd DOTS  ; TRUE ?
+       dd DROP
+      dd CR
+      LITN 05   ; c   ------OK TRUE
+      LITN 30   ; a
+      LITN 10   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+       dd DOTS  ; TRUE ?
+      dd DROP 
+      dd CR
+      LITN 30   ; c
+      LITN 10   ; a
+      LITN  5   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+      dd DOTS
+      dd DROP 
+      dd CR
+dd EXIT		; EXIT		(return from FORTH word)
 
 
-test_shr:
-            LITN 0x12ab34de
-            LITN 8
-            dd SHR
-            dd SYS_EXIT
+defword within_test , within_test ,0
+      ;--------TESTING words------------------
+      ;********WITHIN****OK*******************
+      ;( c a b WITHIN returns true if a <= c and c < b )
+      LITN 5    ; b
+      LITN 10   ; a
+      LITN 30   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+      dd DOTS  ; TRUE ? NO
+      dd DROP
+      dd CR
+      LITN 05   ; c   ------OK TRUE
+      LITN 30   ; a
+      LITN 10   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+      dd DOTS  ; TRUE ? YES
+      dd DROP 
+      dd CR
+      LITN 30   ; c
+      LITN 10   ; a
+      LITN  5   ; b
+      dd DOTS   ; ( c a b )
+      dd WITHIN 
+      dd DOTS  ; TRUE ? NO
+      dd DROP 
+      dd CR
+           
 
-
-
-defcode SYS_EXIT, SYS_EXIT, 0
-            mov eax, 1                  ; Exit to the OS cleanly
-            mov ebx, 0                  ; 
-            int 0x80                    ;
-
-
-; stacks
-section   .bss
-align 4096
-
-screenbuffer:   
-            resb 2000 ;80*25
-
-return_stack:
-            RETURN_STACK_SIZE equ 8192
-            resb RETURN_STACK_SIZE
-return_stack_top:
-
+dd EXIT		; EXIT		(return from FORTH word)

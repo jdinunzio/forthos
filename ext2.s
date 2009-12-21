@@ -46,8 +46,11 @@ defword U.,UDOT,0
 	 dd ADD
 	 dd EMIT	
 	 dd EXIT		; EXIT		(return from FORTH word)
+	 
 ; defword: .S  ( -- ) FORTH word .S prints the contents of the stack.  It doesn't alter the stack.
+;
 ;	Very useful for debugging. ; TESTED_OK
+
 ;: .S		( -- )
 ;	DSP@		( get current stack pointer )
 ;	BEGIN
@@ -58,7 +61,7 @@ defword U.,UDOT,0
 ;		4+		( move up )
 ;	REPEAT
 ;	DROP
-defword .S,DOTS,0
+defword .S  , DOTS ,0
 	LITN '>'
 	dd EMIT
 	dd DSPFETCH ;( get current stack pointer )
@@ -77,10 +80,10 @@ defword .S,DOTS,0
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-defword ID.,IDDOT,0
+
 ; defword: ID. ; TESTED_OK
-;: ID.
-;	4+		( skip over the link pointer )
+defword ID.,IDDOT,0
+;: ID. 4+		( skip over the link pointer )
 ;	DUP C@		( get the flags/length byte )
 ;	F_LENMASK AND	( mask out the flags - just want the length )
 ;
@@ -132,6 +135,7 @@ defword ?IMMEDIATE ,?IMMEDIATE ,0
 
 
 ; defword: WORDS ; TESTED_OK
+;
 ; All words of forthos
 defword WORDS,WORDS,0
 ; WORDS
@@ -187,8 +191,8 @@ defword UWIDTH,UWIDTH,0
 
 
 
-; defword: UR ; NOT TESTED_OK
-defword UR,UDOTR,0
+; defword: U.R ; NOT TESTED_OK
+defword U.R,UDOTR,0
 ;: U.R		( u width -- )
 ;	SWAP		( width u )
 ;	DUP		( width u u )
@@ -206,8 +210,8 @@ defword UR,UDOTR,0
 	dd UDOT
 dd EXIT		; EXIT		(return from FORTH word)
 
-; defword: .R ; NOT TESTED_OK , fehler bei negativen ZAHLEN
-defword DR,DOTR,0
+; defword: .R ;  TESTED_OK (noch nicht alles getestet)
+defword .R,DOTR,0
 ;(
 ;	.R prints a signed number, padded to a certain width.  We can't just print the sign
 ;	and call U.R because we want the sign to be next to the number ('-123' instead of '-  123').
@@ -259,17 +263,17 @@ defword DR,DOTR,0
 		LITN '-'
 		dd EMIT
 	else
-		LITN '+'
-		dd EMIT
 	then
 	dd UDOT
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-; defword: DT ; NOT TESTED_OK
+; defword: DT ;  TESTED_OK
+;
+;: . 0 .R SPACE ;
 defword . , DOT ,0
 ;( Finally we can define word . in terms of .R, with a trailing space. )
-;: . 0 .R SPACE ;
+
 	LITN 0 
 	dd DOTR , SPACE
 	dd EXIT		; EXIT		(return from FORTH word)
@@ -283,10 +287,12 @@ defword ? , QQ ,0
 	dd FETCH , DOT
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defword: WITHIN ; NOT TESTED_OK
+; defword: WITHIN ;  TESTED_OK
+;
+; ( c a b WITHIN returns true if a <= c and c < b )
+;
+; (  or define without ifs: OVER - >R - R>  U<  )
 defword WITHIN , WITHIN ,0
-;( c a b WITHIN returns true if a <= c and c < b )
-;(  or define without ifs: OVER - >R - R>  U<  )
 ;: WITHIN
 ;	-ROT		( b c a )
 ;	OVER		( b c a c )

@@ -33,6 +33,7 @@ main:
 			mov [var_S0],esp 			;Save the initial data stack pointer in FORTH variable S0.
             mov ebp, return_stack_top   ; init the return stack
             mov	dword [var_TST],0
+            mov dword [var_STATE],0
             ;mov eax,[label_ENDE]
             ;mov dword[var_LATEST],eax
             mov	dword [currkey], buffer
@@ -51,12 +52,16 @@ cold_start:
 mes:        dd MES1
 				
  	
-			dd HEX
+			dd DECIMAL
 			dd CLEAR
 			dd WORDS
  			dd CR
  			dd CR
  			dd PRESSKEY
+ 			dd test ; do some tests
+ 			dd PRESSKEY
+ 			
+ 			
  			
 int: 		dd MES2
  	 	 
