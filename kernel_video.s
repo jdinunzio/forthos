@@ -208,6 +208,27 @@ defcode IN ,IN ,0 ; TESTED_OK
 ;THIS IS CODE FORM retro8 by crc
 ;	rewrite it? some day?		
 sys_key:
+ 	xor   ebx,ebx  		; Show the coursor
+	mov   bl,[var_CURSOR_POS_X]				     
+	mov   ecx,ebx
+	mov   bl,[var_CURSOR_POS_Y]				      
+	mov   eax,80
+	mul   bx
+	add   eax,ecx				       
+    mov   edx,0x3d4 
+	mov   ecx,eax
+	mov   al,15
+	out   dx,al
+	mov   eax,ecx
+	inc   edx
+	out   dx,al
+	mov   al,14
+	dec   edx
+	out   dx,al
+	mov   eax,ecx
+	mov   al,ah
+	inc   edx
+	out   dx,al			; Show the coursor end
 	xor eax,eax	        ;  clear eax
 .1:	in al,64h		;  Is any data waiting?
 	test al,1	        ;  Is character = ASCII 0?
@@ -266,12 +287,12 @@ alpha:
   db 0,27,"1234567890-=",8	        ;00-0E
   db 9,"qwertyuiop[]",10	        ;0F-1C
   db 0,"asdfghjkl;'`"		        ;1D-29
-  db -1,"\zxcvbnm,./",-1,"*",0,32,-2    ;2A-3A
+  db -1,"\zxcvbnm,./",-1,"+",0,32,-2    ;2A-3A
 shift:
   db 0,27,"!@#$%^&*()_+",8	        ;00-0E
   db 9,"QWERTYUIOP{}",10	        ;0F-1C
   db 0,'ASDFGHJKL:"~'		        ;1D-29
-  db -1,"|ZXCVBNM<>?",-1,"*",0,32,-2    ;2A-3A
+  db -1,"|ZXCVBNM<>?",-1,"=",0,32,-2    ;2A-3A
 ;THIS IS CODE FORM retro8 by crc end
 ;---------------------------------------------------------------
 video_base:     dd      0xB8000
