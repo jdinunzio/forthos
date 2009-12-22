@@ -3,6 +3,7 @@
 ; by august0815
 ; 19.12.2009
 
+section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
 ; defword: U. ; TESTED_OK

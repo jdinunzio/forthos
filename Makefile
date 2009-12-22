@@ -3,6 +3,9 @@ TEST_OBJS = test.o
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32
 asm = nasm
+naturaldocs = /usr/bin/naturaldocs
+
+.PHONY: docs
 
 .s.o:
 	$(asm) $(ASFLAGS) $<
@@ -24,11 +27,14 @@ image: kernel
 
 kernel.o: forth_words.s forth_core.s
 
-
 run: image
-	#sudo /sbin/losetup /dev/loop0 floppy.img
-	#-sudo bochs -f bochsrc.txt || sudo /sbin/losetup -d /dev/loop0 
 	qemu  -fda floppy.img  
+
+# Generating documentation.
+# Be sure to add "s" to "Extensions:" in "Language: Assembly"
+# in /usr/share/perl5/naturaldocs/Config/Languages.txt
+docs: 
+	$(naturaldocs) -i . -p docs -o HTML docs 
 
 clean:
 	rm -f *.o core kernel test

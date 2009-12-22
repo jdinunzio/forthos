@@ -3,6 +3,7 @@
 ; by august0815
 ; 01.12.2009
 
+section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
 ; defword: CONSTANT NOT TESTED_OK

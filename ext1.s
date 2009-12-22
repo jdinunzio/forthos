@@ -3,7 +3,7 @@
 ; by august0815
 ; 19.12.2009
 
-
+section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
 ;: BL   32 ; \ BL (BLank) is a standard FORTH word for space.

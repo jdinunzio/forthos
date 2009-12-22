@@ -1,5 +1,6 @@
 *.o
 kernel
 test
+docs/*
 z-jonesforth/
 z-origos/

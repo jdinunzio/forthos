@@ -6,6 +6,7 @@
 ; TODO clean up 
 ;
 ; remove not used code
+section .text
 ASO     EQU     '['
 ASC     EQU     ']'
 CW      EQU     4 
@@ -66,7 +67,7 @@ _WORD:
 .1:
 	call	 _KEY ;		// get next key, returned in eax
 	;cmp	0x92,al	;	// start of a comment?
-	cmp al,'\\'		; start of a comment?
+	cmp al,'\'		; start of a comment?
 	je .3			;// if so, skip the comment
 	cmp	 al,' '
 	jne .1			;// if so, keep looking
@@ -127,10 +128,13 @@ _ZEILE:
 	mov ecx,edi		; return length of the word
 	mov edi,zeile_buffer	; return address of the word
 	ret
-	.data			; NB: easier to fit in the .data section
+
+section	.data			; NB: easier to fit in the .data section
 	; A static buffer where WORD returns.  Subsequent calls
 	; overwrite this buffer.  Maximum word length is 1024 chars.
 zeile_buffer: times 1024 db 0
+
+section .text
 rubout:
 		dec edi
 		push    eax
@@ -367,7 +371,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 ; defcode: IMMEDIATE  not tested
 	defcode IMMEDIATE , IMMEDIATE , F_IMMED
 	mov edi,[var_LATEST]	; LATEST word.
-	add byte edi,4		; Point to name/flags byte.
+	add edi,4		; Point to name/flags byte.
 	xor	byte [edi], F_IMMED	; Toggle the IMMED bit.
 	NEXT
 
@@ -421,7 +425,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 
 ; defcode: "LITSTRING",9,,LITSTRING
 	defcode LITSTRING,LITSTRING,0
-	lodsl			; get the length of the string
+	lodsd			; get the length of the string
 	push esi		; push the address of the start of the string
 	push eax		; push it on the stack
 	add esi,eax		; skip past the string
@@ -462,7 +466,7 @@ _tlwd:
 	mov dword [var_TST1],0xffff
 	ret
 .5	inc ebx
-	cmp al,'\\'		; start of a comment?
+	cmp al,'\'		; start of a comment?
 	je .3			; if so, skip the comment
 	cmp al,' '
 	jbe .1			; if so, keep looking
@@ -481,7 +485,7 @@ _tlwd:
 	mov edi,ptr_buff	; return address of the word
 	mov dword [var_PPTR],ebx
 	ret
-.4	
+.4:	
 	;/* Code to skip \ comments to end of the current line. */
 .3:
 	mov al,[ebx] ;_KEY		; get next key, returned in %eax
@@ -489,11 +493,13 @@ _tlwd:
 	cmp al,$13	; end of line yet?
 	jne .3
 	jmp .1
-	.data			; NB: easier to fit in the .data section
+
+section .data			; NB: easier to fit in the .data section
 	; A static buffer where WORD returns.  Subsequent calls
 	; overwrite this buffer.  Maximum word length is 256 chars.
 ptr_buff: times 256 db 0
 		
+section .text
 ;defcode: INTERPRET   compilinf fails!!
 	defcode INTERPRET,INTERPRET,0  
 	mov	dword [var_TST],0	
@@ -566,12 +572,10 @@ ptr_buff: times 256 db 0
 	NEXT
 ;interpret_is_lit db 0
 
-
 errmsg: db 'PARSE ERROR: ' ,0
-
 in_len db 0
+in_point db 0
 
-in_point db 
+;in_buff: resb 256
 
-in_buff: resb 256	
 %include "ext1.s"

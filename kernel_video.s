@@ -271,7 +271,7 @@ sys_key:
         add     eax,[video_base]
         pop     ebx
         mov     [eax],cx
-.3
+.3:
        
         pop     ecx
         pop     ebx

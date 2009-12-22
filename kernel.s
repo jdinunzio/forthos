@@ -73,6 +73,7 @@ int: 		dd MES2
    
 interpret_is_lit db 0     
 pptr: dw 0            
+
 section .data
 bienvenida:     db 'Bienvenido a ', 0
 osname          db 'Goyo-OS-FORTH-0.0.1', 0
@@ -84,8 +85,7 @@ inputloop		db 'Enter  words' , 0
 gef: 			db 'GEFUNDEN' , 0
 ngef: 			db 'NICHT IN TABELLE' , 0
 stackmes:		db 'STACK> ', 0
-
-in_key: resb 256
+in_key:         times 256 db 0
 
 ; stacks
 section   .bss

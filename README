@@ -1,11 +1,14 @@
-
-
 FORTHOS
 
+A forth interpreter as a operative system.
 
 This is based on :
 "A FORTH compiler and tutorial - a step-by-step implementation of a FORTH language system."
 on http://annexia.org/forth
+
+and in Bran's Kernel Development Tutorial, by Brandon Friesen at 
+http://www.osdever.net/bkerndev/Docs/title.htm
+
 
 Port to nasm started by jdinuncio (José Dinuncio)
 
@@ -17,7 +20,7 @@ REMARK
 for compiling the source you need nasm ver.2.0x 
 compiling with nasm 0.98 in UBUNTU 8.04 failed!!!
 
-I test the kernel with  qemu.
+August (augustulus@freenet) tested the kernel with  qemu.
 
 LICENCE of  jonesforth.S.txt:
  "/*	A sometimes minimal FORTH compiler and tutorial for Linux / i386 systems. -*- asm -*-
