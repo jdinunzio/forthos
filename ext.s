@@ -1,4 +1,3 @@
-
 ; file: ext
 ; by august0815
 ; 19.12.2009
@@ -12,7 +11,7 @@ ASC     EQU     ']'
 CW      EQU     4 
 D_HOFFSET EQU     1
 
-; defcode: KEY  NOT_TESTED_NOT_USED
+; function: KEY  NOT_TESTED_NOT_USED
 defcode KEY,KEY,0
 	call	 _KEY
 	push	eax		;// push return value on stack
@@ -56,7 +55,7 @@ bufftop:
 
 
 
-; defcode: TWORD   (rename later to WORD?) NOT_TESTED_NOT_USED
+; function: TWORD   (rename later to WORD?) NOT_TESTED_NOT_USED
 defcode TWORD , TRWORD , 0
 	call	 _WORD
 	push	edi	;	// push base address
@@ -97,7 +96,7 @@ section .data
 word_buffer: times 256 db 0
 
 
-; defcode: ZEILE  ; einlesen einer Zeile bis CR   TESTED_OK
+; function: ZEILE  ; einlesen einer Zeile bis CR   TESTED_OK
 ;
 ; edi  push base address
 ; ecx		 push length
@@ -159,7 +158,7 @@ rubout:
         pop     eax
 	ret	
 	
-; defcode:  NUMBER  TESTED_OK
+; function:  NUMBER  TESTED_OK
 ;
 ; IN : ecx 	 length of string
 ;
@@ -220,7 +219,7 @@ _NUMBER:
 .5:	ret
 
 
-; defcode: FIND   TESTED_OK
+; function: FIND   TESTED_OK
 ;
 ; IN: ecx = length
 ; edi = address
@@ -268,7 +267,7 @@ _FIND:
 
 
 
-; defcode: ">CFA"  TESTED_OK
+; function: ">CFA"  TESTED_OK
 	defcode >CFA,TCFA,0
 	pop edi
 	call _TCFA
@@ -287,13 +286,13 @@ _TCFA:
 
 
 
-; defcode: >DFA
+; function: >DFA
 defword >DFA,TDFA,0
 	dd TCFA		; >CFA		(get code field address)
 	dd INCR4		; 4+		(add 4 to it to get to next word)
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defcode: CREATE
+; function: CREATE
 defcode CREATE, CREATE, 0
 	
     pop ecx		; %ecx = length
@@ -332,7 +331,7 @@ _COMMA:
 	mov dword [var_HERE],edi,	; HERE
 	ret
 
-; defcode: [   TESTED_OK
+; function: [   TESTED_OK
 defcode [ ,LBRAC,F_IMMED ;;F_IMMED,LBRAC,0
 	xor eax,eax
 	mov dword [var_STATE],eax	; Set STATE to 0.
@@ -342,7 +341,7 @@ defcode [ ,LBRAC,F_IMMED ;;F_IMMED,LBRAC,0
 	mov dword [var_STATE],1	; Set STATE to 1.
 	NEXT
 
-; defcode: ":"   ; bug ,bug ,bug !!
+; function: ":"   ; bug ,bug ,bug !!
 defword COL , COLON  ,0
 	dd _tlwd		; Get the name of the new word
 	
@@ -358,7 +357,7 @@ defword COL , COLON  ,0
 	dd RBRAC		; Go into compile mode.
 	dd EXIT		; Return from the function.
 
-; defcode: ;     ; bug , bug !!
+; function: ;     ; bug , bug !!
 defword SK ,SEMICOLON,F_IMMED ;F_IMMED
     ;LITN ngef
     ;dd PRINTCSTRING
@@ -368,21 +367,21 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 	dd LBRAC		; Go back to IMMEDIATE mode.
 	dd EXIT		; Return from the function.
 
-; defcode: IMMEDIATE  not tested
+; function: IMMEDIATE  not tested
 	defcode IMMEDIATE , IMMEDIATE , F_IMMED
 	mov edi,[var_LATEST]	; LATEST word.
 	add edi,4		; Point to name/flags byte.
 	xor	byte [edi], F_IMMED	; Toggle the IMMED bit.
 	NEXT
 
-; defcode: HIDDEN
+; function: HIDDEN
 	defword HIDDEN,HIDDEN,0
 	pop edi		; Dictionary entry.
 	add edi,4		; Point to name/flags byte.
 	xor byte [edi],F_HIDDEN	; Toggle the HIDDEN bit.
 	dd EXIT ;NEXT
 	
-; defcode: HIDE	
+; function: HIDE	
 	defword HIDE,HIDE,0
 	dd TRWORD		; Get the word (after HIDE).
 	dd FIND		; Look up in the dictionary.
@@ -392,7 +391,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 
 
 
-; defcode: "QUIT",4,,QUIT	not used !! remove
+; function: "QUIT",4,,QUIT	not used !! remove
 ; QUIT must not return (ie. must not call EXIT).
 	defword QUIT,QUIT,0
 	;dd RZ,RSPSTORE	; R0 RSP!, clear the return stack
@@ -415,7 +414,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 
 	
 
-; defcode: "'"
+; function: "'"
 	defcode TT,TICK,0
 	lodsd			; Get the address of the next word and skip it.
 	push eax		; Push it on the stack.
@@ -423,7 +422,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 	
 ; TODO Branching??
 
-; defcode: "LITSTRING",9,,LITSTRING
+; function: "LITSTRING",9,,LITSTRING
 	defcode LITSTRING,LITSTRING,0
 	lodsd			; get the length of the string
 	push esi		; push the address of the start of the string
@@ -433,7 +432,7 @@ defword SK ,SEMICOLON,F_IMMED ;F_IMMED
 	and esi,~3
 	NEXT
 
-; defcode: TELL   rewrite it !!!! still for linux
+; function: TELL   rewrite it !!!! still for linux
 defcode TELL ,TELL , 0
 	mov ebx,1		; 1st param: stdout
 	pop edx		; 3rd param: length of string
@@ -443,7 +442,7 @@ defcode TELL ,TELL , 0
 	NEXT
 	
 
-; defcode: TEILWORT  rename later to WORD ; TESTED_OK 
+; function: TEILWORT  rename later to WORD ; TESTED_OK 
 ;
 ; gibt den pointer des strings aus zeilenbuffer bis zum Leerzeichen
 ; zurück , PPTR zeigt danach auf das nächste Wort

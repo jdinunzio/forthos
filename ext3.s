@@ -6,7 +6,7 @@
 section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
-; defword: CONSTANT NOT TESTED_OK
+; function: CONSTANT NOT TESTED_OK
 ; : CONSTANT
 ;	WORD		( get the name (the name follows CONSTANT) )
 ;	CREATE		( make the dictionary entry )
@@ -22,7 +22,7 @@ defword CONSTANT,CONSTANT,0
     dd TICK , EXIT
 	dd EXIT		; EXIT		(return from FORTH word
 
-; defword: ALLOT NOT TESTED_OK
+; function: ALLOT NOT TESTED_OK
 ;	First ALLOT, where n ALLOT allocates n bytes of memory.  (Note when calling this that
 ;	it's a very good idea to make sure that n is a multiple of 4, or at least that next time
 ;	a word is compiled that HERE has been left as a multiple of 4).
@@ -33,7 +33,7 @@ defword ALLOT,ALLOT,0
 	dd HERE ,FETCH ,SWAP
 	dd HERE ,ADDSTORE
 	dd EXIT		; EXIT		(return from FORTH word
-; defword: CELLS : CELLS ( n -- n ) 4 * ; NOT TESTED_OK
+; function: CELLS : CELLS ( n -- n ) 4 * ; NOT TESTED_OK
 ;	Second, CELLS.  In FORTH the phrase 'n CELLS ALLOT' means allocate n integers of whatever size
 ;	is the natural size for integers on this machine architecture.  On this 32 bit machine therefore
 ;	CELLS just multiplies the top of stack by 4.
@@ -41,7 +41,7 @@ defword CELLS,CELLS,0,
     dd 4 , MUL
 	dd EXIT		; EXIT		(return from FORTH word
 
-; defword: VARIABLE NOT TESTED_OK
+; function: VARIABLE NOT TESTED_OK
 ;	So now we can define VARIABLE easily in much the same way as CONSTANT above.  Refer to the
 ;	diagram above to see what the word that this creates will look like.
 ;: VARIABLE

@@ -1,21 +1,14 @@
 ; file: kernel_video
 
-
-;%ifndef kernel_video
-;%define kernel_video
-;%include "forth_words.s"
 [BITS 32]
-
 defcode OUTB, OUTB, 0
             ; ( val addr -- )
             pop edx
             pop eax
             out dx, al
             NEXT
-
 		
 ; Screen words
-; XXX: Durante las pruebas SCREEN sera definido en test.s y en kernel.s
 ;defconst SCREEN, SCREEN, 0, 0xB8000
 ; var: CURSOR_POS_X
 defvar CURSOR_POS_X, CURSOR_POS_X, 0 , 0
@@ -48,6 +41,7 @@ defword: AT_HW, AT_HW, 0
             LITN 0x3D5          ;
             dd OUTB             ;
             dd EXIT
+
 ;defword: atx
 defword atx, atx, 0
             ; ( y:line x:col -- )
@@ -55,6 +49,7 @@ defword atx, atx, 0
             dd CURSOR_POS_Y, STORE
             dd AT_HW
             dd EXIT
+
 ;defcode: INK
 defcode INK, INK, 0
             ; ( ink -- )
@@ -90,12 +85,14 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
             or eax, ebx
             push eax
             NEXT
+
 ;defword:  BRIGHT
 defword BRIGHT, BRIGHT, 0
             dd LIT
             dd 8
             dd ADD
             dd EXIT
+
 ;defword: CURSOR_POS_REL
 defword CURSOR_POS_REL, CURSOR_POS_REL, 0
             ; ( -- cursorpos)
@@ -107,16 +104,19 @@ defword CURSOR_POS_REL, CURSOR_POS_REL, 0
             dd MUL
             dd ADD
             dd EXIT
+
 ;defword: CURSOR_POS
 defword CURSOR_POS, CURSOR_POS, 0
             dd CURSOR_POS_REL
             dd SCREEN   ; constante
             dd ADD
             dd EXIT
+
 ;defcode: SCREEN_SCROLL
 defcode SCREEN_SCROLL, SCREEN_SCROLL, 0
             ;call vScrollUp
             dd NEXT
+
 ;defword: SCREEN_SCROLL_
 defword SCREEN_SCROLL_, SCREEN_SCROLL_, 0
             dd CURSOR_POS_Y, FETCH
@@ -128,6 +128,7 @@ defword SCREEN_SCROLL_, SCREEN_SCROLL_, 0
                 dd SCREEN_SCROLL
             then
             dd EXIT
+
 ;defword: CURSOR_FORWARD
 defword CURSOR_FORWARD, CURSOR_FORWARD, 0
             LITN 1
@@ -140,6 +141,7 @@ defword CURSOR_FORWARD, CURSOR_FORWARD, 0
             dd SCREEN_SCROLL_
             dd AT_HW
             dd EXIT
+
 ;defword: EMITCW
 defword EMITCW, EMITCW, 0
             ; prints a charword (attributes+character)
@@ -148,12 +150,14 @@ defword EMITCW, EMITCW, 0
             dd STOREWORD
             dd CURSOR_FORWARD
             dd EXIT
+
 ;defword: EMIT
 defword EMIT , EMIT , 0
             ; ( char -- )
             dd CHAR_TO_CHARWORD
             dd EMITCW
             dd EXIT
+
 ;defword: PRINTCSTRING
 defword PRINTCSTRING, PRINTCSTRING, 0
             ; ( &cstring -- )
@@ -180,6 +184,7 @@ defword CLEAR, CLEAR, 0
             LITN 0                  ;
             dd atx                  ;
             dd EXIT
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; new code
             
@@ -199,12 +204,14 @@ defword TAB , TAB ,0
             dd CURSOR_POS_X, ADDSTORE
 			dd AT_HW
 			dd EXIT		
+
 ;THIS IS CODE FORM retro8 by crc
 ;			
 ;defcode: IN => KEY		
 defcode IN ,IN ,0 ; TESTED_OK
 		call sys_key
 		NEXT
+
 ;THIS IS CODE FORM retro8 by crc
 ;	rewrite it? some day?		
 sys_key:
@@ -277,6 +284,7 @@ sys_key:
         pop     ebx
         pop     eax
 	ret
+
 ;THIS IS CODE FORM retro8 by crc	
 .shift:  mov ecx,[edx*4 + .shifts]	 ;  Load the CAPITAL keymap
 	mov [board],ecx 	        ;  Store into BOARD pointer
@@ -293,6 +301,7 @@ shift:
   db 9,"QWERTYUIOP{}",10	        ;0F-1C
   db 0,'ASDFGHJKL:"~'		        ;1D-29
   db -1,"|ZXCVBNM<>?",-1,"=",0,32,-2    ;2A-3A
+
 ;THIS IS CODE FORM retro8 by crc end
 ;---------------------------------------------------------------
 video_base:     dd      0xB8000

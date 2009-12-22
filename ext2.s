@@ -6,7 +6,7 @@
 section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
-; defword: U. ; TESTED_OK
+; function: U. ; TESTED_OK
 ;PRINTING NUMBERS ---
 ; ( This is the underlying recursive definition of U. )
 ;: U.		( u -- )
@@ -48,7 +48,7 @@ defword U.,UDOT,0
 	 dd EMIT	
 	 dd EXIT		; EXIT		(return from FORTH word)
 	 
-; defword: .S  ( -- ) FORTH word .S prints the contents of the stack.  It doesn't alter the stack.
+; function: .S  ( -- ) FORTH word .S prints the contents of the stack.  It doesn't alter the stack.
 ;
 ;	Very useful for debugging. ; TESTED_OK
 
@@ -82,7 +82,7 @@ defword .S  , DOTS ,0
 
 
 
-; defword: ID. ; TESTED_OK
+; function: ID. ; TESTED_OK
 defword ID.,IDDOT,0
 ;: ID. 4+		( skip over the link pointer )
 ;	DUP C@		( get the flags/length byte )
@@ -114,7 +114,7 @@ defword ID.,IDDOT,0
 	dd EXIT		; EXIT		(return from FORTH word)
 	
 defword ?HIDDEN ,?HIDDEN ,0
-; defword: ?HIDDEN	 NOT TESTED_OK
+; function: ?HIDDEN	 NOT TESTED_OK
 ;: ?HIDDEN
 ;	4+		( skip over the link pointer )
 ;	C@		( get the flags/length byte )
@@ -125,7 +125,7 @@ defword ?HIDDEN ,?HIDDEN ,0
 	dd EXIT		; EXIT		(return from FORTH word)
 	
 defword ?IMMEDIATE ,?IMMEDIATE ,0
-; defword: ?IMMEDIATE NOT TESTED_OK
+; function: ?IMMEDIATE NOT TESTED_OK
 ;: ?IMMEDIATE
 ;	4+		( skip over the link pointer )
 ;	C@		( get the flags/length byte )
@@ -135,7 +135,7 @@ defword ?IMMEDIATE ,?IMMEDIATE ,0
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-; defword: WORDS ; TESTED_OK
+; function: WORDS ; TESTED_OK
 ;
 ; All words of forthos
 defword WORDS,WORDS,0
@@ -170,7 +170,7 @@ defword WORDS,WORDS,0
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-; defword: UWIDTH ; NOT TESTED_OK
+; function: UWIDTH ; NOT TESTED_OK
 defword UWIDTH,UWIDTH,0
 ;( This word returns the width (in characters) of an unsigned number in the current base )
 ;: UWIDTH	( u -- width )
@@ -192,7 +192,7 @@ defword UWIDTH,UWIDTH,0
 
 
 
-; defword: U.R ; NOT TESTED_OK
+; function: U.R ; NOT TESTED_OK
 defword U.R,UDOTR,0
 ;: U.R		( u width -- )
 ;	SWAP		( width u )
@@ -211,7 +211,7 @@ defword U.R,UDOTR,0
 	dd UDOT
 dd EXIT		; EXIT		(return from FORTH word)
 
-; defword: .R ;  TESTED_OK (noch nicht alles getestet)
+; function: .R ;  TESTED_OK (noch nicht alles getestet)
 defword .R,DOTR,0
 ;(
 ;	.R prints a signed number, padded to a certain width.  We can't just print the sign
@@ -269,7 +269,7 @@ defword .R,DOTR,0
 	dd EXIT		; EXIT		(return from FORTH word)
 
 
-; defword: DT ;  TESTED_OK
+; function: DT ;  TESTED_OK
 ;
 ;: . 0 .R SPACE ;
 defword . , DOT ,0
@@ -281,14 +281,14 @@ defword . , DOT ,0
 ; The real U., note the trailing space. ) 
 ;: U. U. SPACE ;	??
 
-; defword: ? ; NOT TESTED_OK
+; function: ? ; NOT TESTED_OK
 defword ? , QQ ,0
 ;( ? fetches the integer at an address and prints it. )
 ;: ? ( addr -- ) @ . ;
 	dd FETCH , DOT
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defword: WITHIN ;  TESTED_OK
+; function: WITHIN ;  TESTED_OK
 ;
 ; ( c a b WITHIN returns true if a <= c and c < b )
 ;
@@ -320,7 +320,7 @@ defword WITHIN , WITHIN ,0
 	then
 	dd EXIT		; EXIT		(return from FORTH word)
 
-; defword: ALIGNED ; NOT TESTED_OK
+; function: ALIGNED ; NOT TESTED_OK
 defword ALIGNED , ALIGNED ,0
 ;	ALIGNED takes an address and rounds it up (aligns it) to the next 4 byte boundary.
 ;: ALIGNED	( addr -- addr )
@@ -331,7 +331,7 @@ defword ALIGNED , ALIGNED ,0
 	dd INVERT ,AND
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defword: ALIGN ; NOT TESTED_OK rename !!!
+; function: ALIGN ; NOT TESTED_OK rename !!!
 defword ALI , ALI ,0
 ;ALIGN aligns the HERE pointer, so the next word appended will be aligned properly.
 ;: ALIGN HERE @ ALIGNED HERE ! ;
@@ -340,7 +340,7 @@ defword ALI , ALI ,0
 	dd HERE , STORE
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defword: C, ; NOT TESTED_OK rename !!!
+; function: C, ; NOT TESTED_OK rename !!!
 ;( C, appends a byte to the current compiled word. )
 defword CK, CKOMMA ,0
 ;: C,
@@ -349,7 +349,7 @@ defword CK, CKOMMA ,0
 
 	dd EXIT		; EXIT		(return from FORTH word)
 
-; defword: SAP ; NOT TESTED_OK rename !!!
+; function: SAP ; NOT TESTED_OK rename !!!
 defword SAP, SAP ,0
 ;: S" IMMEDIATE		( -- addr len )
 ;	STATE @ IF	( compiling? )
@@ -384,7 +384,7 @@ defword SAP, SAP ,0
 ;	THEN
 	dd EXIT		; EXIT		(return from FORTH word)
 	
-; defword: .AP ; NOT TESTED_OK rename !!!	
+; function: .AP ; NOT TESTED_OK rename !!!	
 defword .AP, DOTAP ,0
 ;: ." IMMEDIATE		( -- )
 ;	STATE @ IF	( compiling? )

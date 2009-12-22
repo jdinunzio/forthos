@@ -1,6 +1,10 @@
 File: License
 
-Topic: PUBLIC DOMAIN-LICENSE
+Topic: This project is licensed under the GPL.
 
+ForthOs is based in JonesForth, A sometimes minimal FORTH compiler and 
+tutorial for Linux / i386 system, by Richard W.M. Jones 
+http://annexia.org/forth, which is in the public domain,
+and in Bran's Kernel Development Tutorial, by Brandon Friesen at
+http://www.osdever.net/bkerndev/Docs/title.htm
 
-see http://annexia.org/forth

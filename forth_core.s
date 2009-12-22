@@ -2,15 +2,15 @@
 ;
 ; myforth: My own forth system.
 ;
-; This is a translation of jonesforth 
-;
-; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm
+; This file is a translation of jonesforth 
+; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm.
 
 %ifndef forth_core
 %define forth_core
-%include "forth_core.mac"
+%include "forth_macros.s"
 
 [BITS 32]
+; Topic: Introduction
 ; Forth is an extensible, powerfull concatenative language/environment. This
 ; file contains the core routines needed for a minimal functional forth
 ; environment.
@@ -21,19 +21,19 @@
 ;
 ; This is the word structure in this implementation
 ;
-;  +---------------+
-;  |     LINK      |  Link to the previous word
-;  +---------------+
-;  |  FLAGS + LEN  |  Several flags + length of the word name
-;  +---------------+
-;  |     NAME      |  Word name (4 bytes aligned)
-;  +---------------+
-;  |   CODEWORD    |  Pointer to the routine that executes this word
-;  +---------------+
-;  |     BODY      |  Optionally, if this is a defword, a serie of
-;  +---------------+    pointers to the codewors of each word that
-;  |     ...       |    define the current word.
-;  +---------------+
+; | +---------------+
+; | |     LINK      |  Link to the previous word
+; | +---------------+
+; | |  FLAGS + LEN  |  Several flags + length of the word name
+; | +---------------+
+; | |     NAME      |  Word name (4 bytes aligned)
+; | +---------------+
+; | |   CODEWORD    |  Pointer to the routine that executes this word
+; | +---------------+
+; | |     BODY      |  Optionally, if this is a defword, a serie of
+; | +---------------+    pointers to the codewors of each word that
+; | |     ...       |    define the current word.
+; | +---------------+
 ;
 ; The next word to be executed is pointed by the esi register. The NEXT macro
 ; is the responsable for its execution and the esi update.
@@ -59,13 +59,13 @@
             F_IMMED    equ  0x80    ; Word is inmediate
             F_HIDDEN   equ  0x20    ; Word is hidden
             F_LENMASK  equ  0x1f    ;
-            %define LINK 0          ; Address of the las header word
+            %define LINK 0          ; Address of the last header word
 
 ;  Virtual Machine variables
 
 ; var: STATE       Is the interpreter executing code (0) or compiling (non-zero)?
 
-; var LATEST      Points to the newset  word in the dictionary.
+; var LATEST       Points to the newset  word in the dictionary.
 
 ; var: HERE        Points to the next free byte of memory.
 
@@ -92,7 +92,6 @@
 
 ; const: F_LENMASK   The length mask in the flags/len byte.
 
-
             defconst VERSION, VERSION, 0, 1
             defconst R0, R0, 0, 2
             defconst DOCOL, __DOCOL, 0, DOCOL
@@ -101,19 +100,20 @@
             defconst F_LENMASK, __F_LENMASK, 0, 0x1f
 
 
-; defcode: DOCOL
+section .text
+align 4
+
+; function: DOCOL
 ;   This is the core of the forth virtual machine. This routine executes the
 ;   non-native words. A non-native word is formed by a serie of pointers to the 
 ;   codewords of other forth words. DOCOL executes each one of these codewords.
-section .text
-align 4
 DOCOL:
             PUSHRSP esi         ; Saves the return point
             add eax, 4          ; eax pointed to the codeword of this word,
             mov esi, eax        ;   now esi points to the first word
             NEXT
 
-; defcode: EXIT
+; function: EXIT
 ;   EXIT is the last word of a forth word (a non-defcode word). It restores the 
 ;   value of esi, stored in the return stack by DOCOL when this word started.
 defcode EXIT, EXIT, 0

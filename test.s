@@ -58,6 +58,4 @@ defword within_test , within_test ,0
       dd DOTS  ; TRUE ? NO
       dd DROP 
       dd CR
-           
-
 dd EXIT		; EXIT		(return from FORTH word)

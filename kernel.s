@@ -11,9 +11,6 @@
 ;%include "kernel_video.s"
 
 [BITS 32]
-
-; XXX: Mientras se hagan pruebas en kernel_video
-; definimos esta variable aca
 defconst SCREEN, SCREEN, 0, 0xB8000
 defvar PPTR, PPTR, 0 , 0
 defvar ISLIT, ISLIT, 0 , 0
@@ -30,7 +27,7 @@ defvar CONTEXT , CONTEXT , 0, 0
 section .text
 GLOBAL main
 main:
-			mov [var_S0],esp 			;Save the initial data stack pointer in FORTH variable S0.
+			mov [var_S0],esp 			; Save the initial data stack pointer in FORTH variable S0.
             mov ebp, return_stack_top   ; init the return stack
             mov	dword [var_TST],0
             mov dword [var_STATE],0
@@ -50,8 +47,6 @@ cold_start:
 			dd WELCOM
 			dd CLEAR 
 mes:        dd MES1
-				
- 	
 			dd DECIMAL
 			dd CLEAR
 			dd WORDS
@@ -60,24 +55,19 @@ mes:        dd MES1
  			dd PRESSKEY
  			dd test ; do some tests
  			dd PRESSKEY
- 			
- 			
- 			
-int: 		dd MES2
- 	 	 
+
+int: 		dd MES2 	 	 
 			dd ZEIL
-     
         	branch int
-  
   		    dd STOP
    
 interpret_is_lit db 0     
 pptr: dw 0            
 
 section .data
-bienvenida:     db 'Bienvenido a ', 0
+bienvenida:     db 'Welcome to ', 0
 osname          db 'Goyo-OS-FORTH-0.0.1', 0
-colofon         db 'Espere cosas grandes de Goyo-OS en el futuro...', 0
+colofon         db 'Wait good thing in the future...', 0
 ok: 			db '  OK ... ' ,0
 key_press: 		db '   PRESS ANY KEY  .... ' , 0
 outputmes 		db 'Words of forth' , 0

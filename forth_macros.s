@@ -1,17 +1,18 @@
-; program: forth_core.macros
+; program: forth_macros
 
-; myforth: My own forth system.
+; Topic: Forth macros
+;
+; This file and *forth_core.s* are the base of the forth system
+;
+; Here are defined the most basic macros of the forth kernel.
+;
 ; This is a translation of jonesforth 
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm
+
 ; Bug in defcode macro corrected . august0815 14.12.2009
 ; autodoc with NaturalDocs 19.12.2009
-[BITS 32]
-; ============================================================================
-;    Forth Macros
-; ============================================================================
-; These macros are defined to facilitate the task of write forth words in
-; assembler. 
 
+[BITS 32]
 ; define: NEXT macro
 ; NEXT macro
 ;  * Executes the next forth word.
@@ -137,13 +138,13 @@
             dd %1
 %endmacro
 
-
 ;  convenience macros
 ; define: branch 1
 %macro branch 1
         dd BRANCH 
         dd %1 - $
 %endmacro
+
 ; define: zbranch 1
 %macro zbranch 1
         dd ZBRANCH 
@@ -170,9 +171,7 @@
         %pop 
 %endmacro
 
-
 ; define: end ini DO ... LOOP
-
 ;  * e.g :	LITN 80*25              ; for i = 0 to 80*25
 ;  *         LITN 0                  ;
 ;  *         do
@@ -197,7 +196,6 @@
 
 
 ; define: BEGIN ... cond UNTIL
-
 %macro begin 0
         %push begin_loop
     %$loop:
@@ -210,7 +208,6 @@
 %endmacro
 
 ; define:  BEGIN cond WHILE ... REPEAT
-
 ;  * e.g :	 begin
 ;  *              dd DUP, FETCHBYTE, DUP
 ;  *         while

@@ -1,7 +1,7 @@
 ; program: forth_words
 
 ; myforth: My own forth system.
-; This is a translation of jonesforth 
+; This file is a translation of jonesforth
 ; [http:;www.annexia.org/_file/jonesforth.s.txt] for being compiled with nasm
 
 %ifndef forth_words
@@ -12,40 +12,44 @@
 ; forthword ptrs contains the basic words of a forth interpreter. The escential
 ; routines and word ptrs are in forthcore.
 
-; defcode: STOP endless loop
+; function: STOP endless loop
 defcode STOP, STOP, 0
             jmp $
 
 
-; defcode: LIT takes the next word (a literal value) in a word definition and stores it in the stack.
+; function: LIT takes the next word (a literal value) in a word definition and stores it in the stack.
 defcode LIT, LIT, 0
             lodsd               ; Load the next word in the current definition
             push eax            ; pushes it on the stack
             NEXT                ; and executes the following word
             
 ;Basic stack word ptrs
-; defcode: DROP 
+; function: DROP 
 defcode DROP, DROP,0
             pop eax       
             NEXT
-; defcode: SWAP
+
+; function: SWAP
 defcode SWAP, SWAP,0
             pop eax       
             pop ebx
             push eax
             push ebx
             NEXT
-; defcode: DUP
+
+; function: DUP
 defcode DUP, DUP, 0
             mov eax, [esp]    
             push eax
             NEXT
-; defcode: OVER
+
+; function: OVER
 defcode OVER, OVER, 0
             mov eax, [esp + 4]   
             push eax      
             NEXT
-; defcode: ROT
+
+; function: ROT
 defcode ROT, ROT, 0
             pop eax
             pop ebx
@@ -54,7 +58,8 @@ defcode ROT, ROT, 0
             push ecx
             push ebx
             NEXT
-; defcode: -ROT
+
+; function: -ROT
 defcode -ROT, NROT, 0
             pop eax
             pop ebx
@@ -63,19 +68,22 @@ defcode -ROT, NROT, 0
             push eax
             push ecx
             NEXT
-; defcode: 2DROP
+
+; function: 2DROP
 defcode 2DROP, TWODROP, 0
             pop eax
             pop eax
             NEXT
-; defcode: 2DUP
+
+; function: 2DUP
 defcode 2DUP, TWODUP, 0
             mov eax, [esp]
             mov ebx, [esp + 4]
             push ebx
             push eax
             NEXT
-; defcode: 2SWAP
+
+; function: 2SWAP
 defcode 2SWAP, TWOSWAP, 0
             pop eax
             pop ebx
@@ -86,41 +94,49 @@ defcode 2SWAP, TWOSWAP, 0
             push edx
             push ecx
             NEXT
-; defcode: ?DUP
+
+; function: ?DUP
 defcode ?DUP, QDUP, 0
             mov eax, [esp]
             test eax, eax
             jz .1
             push eax
 .1: NEXT
-; defcode: 1+
+
+; function: 1+
 defcode 1+, INCR, 0
             ; ( n -- n+1 )
             inc dword [esp]    
             NEXT
-; defcode: 1-
+
+; function: 1-
 defcode 1-, DECR, 0
             dec dword [esp]    
             NEXT
-; defcode: 4+
+
+; function: 4+
 defcode 4+, INCR4, 0
             add dword [esp], 4     
             NEXT
-; defcode: 4-
+
+; function: 4-
 defcode 4-, DECR4, 0
             sub dword [esp], 4     
             NEXT
-; defcode: +
+
+; function: +
 defcode +, ADD, 0
             pop eax       
             add [esp], eax   
             NEXT
-; defcode: -                                                                   
+
+; function: -                                                                   
 defcode -, SUB, 0
             pop eax       
             sub [esp], eax   
             NEXT
-; defcode: *
+
+; function: *
 defcode *, MUL, 0
             pop eax
             pop ebx
@@ -133,7 +149,7 @@ defcode *, MUL, 0
 ;            terms of the primitive /MOD.  The design of the i386 assembly instruction idiv which
 ;            leaves both quotient and remainder makes this the obvious choice.
 
-; defcode: /MOD
+; function: /MOD
 defcode /MOD, DIVMOD, 0
             xor edx, edx
             pop ebx
@@ -142,20 +158,22 @@ defcode /MOD, DIVMOD, 0
             push edx      
             push eax      
             NEXT
-; defcode: /
+
+; function: /
 defword /, DIV, 0
             dd DIVMOD
             dd SWAP
             dd DROP
             dd EXIT
-; defcode: MOD
+
+; function: MOD
 defword MOD, MOD, 0
             dd DIVMOD
             dd DROP
             dd EXIT
 
 ; Comparisons
-; defcode: =
+; function: =
 defcode =, EQU, 0
             pop eax
             pop ebx
@@ -164,7 +182,8 @@ defcode =, EQU, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: <>
+
+; function: <>
 defcode <>, NEQU, 0
             pop eax
             pop ebx
@@ -173,7 +192,8 @@ defcode <>, NEQU, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: <
+
+; function: <
 defcode <, LT, 0
             pop eax
             pop ebx
@@ -182,7 +202,8 @@ defcode <, LT, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: >
+
+; function: >
 defcode >, GT, 0
             pop eax
             pop ebx
@@ -191,7 +212,8 @@ defcode >, GT, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: <=
+
+; function: <=
 defcode <=, LE, 0
             pop eax
             pop ebx
@@ -200,7 +222,8 @@ defcode <=, LE, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: >=
+
+; function: >=
 defcode >=, GE, 0
             pop eax
             pop ebx
@@ -209,7 +232,8 @@ defcode >=, GE, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: 0=
+
+; function: 0=
 defcode 0=, ZEQU, 0
             pop eax
             test eax, eax
@@ -217,7 +241,8 @@ defcode 0=, ZEQU, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: 0<>
+
+; function: 0<>
 defcode 0<>, ZNEQU, 0
             pop eax
             test eax, eax
@@ -225,7 +250,8 @@ defcode 0<>, ZNEQU, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: 0<
+
+; function: 0<
 defcode 0<, ZLT, 0
             pop eax
             test eax, eax
@@ -241,7 +267,8 @@ defcode 0>, ZGT, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: 0<=
+
+; function: 0<=
 defcode 0<=, ZLE, 0
             pop eax
             test eax, eax
@@ -249,7 +276,8 @@ defcode 0<=, ZLE, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: 0>=
+
+; function: 0>=
 defcode 0>=, ZGE, 0
             pop eax
             test eax, eax
@@ -257,72 +285,83 @@ defcode 0>=, ZGE, 0
             movzx eax, al
             push eax
             NEXT
-; defcode: AND
+
+; function: AND
 defcode AND, AND, 0   
             pop eax
             and [esp], eax
             NEXT
-; defcode: OR
+
+; function: OR
 defcode OR, OR, 0 
             pop eax
             or [esp], eax
             NEXT
-; defcode: XOR
+
+; function: XOR
 defcode XOR, XOR, 0   
             pop eax
             xor [esp], eax
             NEXT
-; defcode: INVERT
+
+; function: INVERT
 defcode INVERT, INVERT, 0
             not dword [esp]
             NEXT
 
 ; Memory
-; defcode: !
+; function: !
 defcode !, STORE, 0
             ; ( n addr -- )
             pop ebx       
             pop eax       
             mov [ebx], eax    
             NEXT
-; defcode: @
+
+; function: @
 defcode @, FETCH, 0
             pop ebx       
             mov eax, [ebx]    
             push eax      
             NEXT
-; defcode: +!
+
+; function: +!
 defcode +!, ADDSTORE, 0
             pop ebx       
             pop eax       
             add [ebx], eax   
             NEXT
-; defcode: -!
+
+; function: -!
 defcode -!, SUBSTORE, 0
             pop ebx       
             pop eax       
             sub [ebx], eax   
             NEXT
-; defcode: C!
+
+; function: C!
 defcode C!, STOREBYTE, 0
             pop ebx       
             pop eax       
             mov [ebx], al    
             NEXT
-; defcode: C@
+
+; function: C@
 defcode C@, FETCHBYTE, 0
             pop ebx       
             xor eax, eax
             mov al, [ebx]    
             push eax      
             NEXT
-; defcode: W!
+
+; function: W!
 defcode W!, STOREWORD, 0
             pop ebx       
             pop eax       
             mov [ebx], ax    
             NEXT
-; defcode: W@
+
+; function: W@
 defcode W@, FETCHWORD, 0
             pop ebx       
             xor eax, eax
@@ -331,7 +370,7 @@ defcode W@, FETCHWORD, 0
             NEXT
 
 ; C@C! is a useful byte copy primitive. */
-; defcode: C@C!
+; function: C@C!
 defcode C@C!, CCOPY, 0
             mov ebx, [esp + 4]  	;movl 4(%esp),%ebx	// source address
             mov al, [ebx]    		;movb (%ebx),%al		// get source character
@@ -340,7 +379,8 @@ defcode C@C!, CCOPY, 0
             push edi    			;push %edi		// increment destination address
             inc dword [esp + 4]     ;incl 4(%esp)		// increment source address  
             NEXT
-; defcode: CMOVE
+
+; function: CMOVE
 ; and CMOVE is a block copy operation. */
 defcode CMOVE, CMOVE, 0
             mov edx, esi      
@@ -351,35 +391,40 @@ defcode CMOVE, CMOVE, 0
             mov esi, edx      
             NEXT
 
-; defcode:  >R  Return Stack
+; function:  >R  Return Stack
  defcode >R, TOR, 0
             pop eax       
             PUSHRSP eax       
             NEXT
-; defcode: R>
+
+; function: R>
 defcode R>, FROMR, 0
             POPRSP eax    
             push eax      
             NEXT
-; defcode: RSP@
+
+; function: RSP@
 defcode RSP@, RSPFETCH, 0
             push ebp
             NEXT
-; defcode: RSP!
+
+; function: RSP!
 defcode RSP!, RSPSTORE, 0
             pop ebp
             NEXT
-; defcode: RDROP
+
+; function: RDROP
 defcode RDROP, RDROP, 0
             add ebp, 4       
             NEXT
 
 ; Branching
-; defcode: BRANCH
+; function: BRANCH
 defcode BRANCH, BRANCH, 0
             add esi, [esi]
             NEXT
-; defcode: 0BRANCH
+
+; function: 0BRANCH
 defcode 0BRANCH, ZBRANCH, 0
             pop eax
             test eax, eax
@@ -388,18 +433,19 @@ defcode 0BRANCH, ZBRANCH, 0
             NEXT
 
 ; Data stack manipulation
-; defcode: DSP@
+; function: DSP@
 defcode DSP@, DSPFETCH, 0
     mov eax, esp
     push eax
     NEXT
-; defcode: DSP!
+
+; function: DSP!
 defcode DSP!, DSPSTORE, 0
     pop esp
     NEXT
 
 ; Shift and Rotate
-; defcode: SHL
+; function: SHL
 defcode SHL, SHL, 0
     ; ( n1 n2 -- n1 << n2)
     pop ecx
@@ -407,7 +453,8 @@ defcode SHL, SHL, 0
     shl eax, cl
     push eax
     NEXT
-; defcode: SHR
+
+; function: SHR
 defcode SHR, SHR, 0
     ; ( n1 n2 -- n1 >> n2)
     pop ecx
@@ -415,7 +462,8 @@ defcode SHR, SHR, 0
     shr eax, cl
     push eax
     NEXT
-; defcode: N_BYTE
+
+; function: N_BYTE
 defword N_BYTE, N_BYTE, 0
     ; Gives the n-th byte of a cell
     ; ( b3b2b1b0 n -- bn)
