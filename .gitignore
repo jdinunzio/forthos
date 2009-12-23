@@ -1,4 +1,5 @@
 *.o
+floppy.img
 kernel
 test
 docs/*
