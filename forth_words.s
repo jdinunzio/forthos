@@ -4,8 +4,6 @@
 ; This file is a translation of jonesforth
 ; [http:;www.annexia.org/_file/jonesforth.s.txt] for being compiled with nasm
 
-%ifndef forth_words
-%define forth_words
 %include "forth_core.s"
 
 [BITS 32]
@@ -474,8 +472,4 @@ defword N_BYTE, N_BYTE, 0
     dd AND
     dd EXIT
 
-%include "kernel_video.s"
-
-	
-%endif
-
+;%include "kernel_words.s"

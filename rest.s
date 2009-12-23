@@ -4,6 +4,7 @@
 ; by august0815
 ; 01.12.2009
 
+%include "ext3.s"
 
 ; defword: MES1   TESTED_OK
 defword MES1,MES1,0
@@ -272,4 +273,4 @@ defword WELCOM , WELCOM ,0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-%include "test.s"
+;%include "test.s"

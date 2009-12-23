@@ -2,6 +2,9 @@
 ; by august0815
 ; 19.12.2009
 
+
+%include "kernel_kbd.s"
+
 ; TODO clean up 
 ;
 ; remove not used code
@@ -577,4 +580,4 @@ in_point db 0
 
 ;in_buff: resb 256
 
-%include "ext1.s"
+;%include "ext1.s"

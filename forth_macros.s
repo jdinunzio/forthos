@@ -228,3 +228,5 @@
         branch %$exit
         %pop
 %endmacro
+
+;%include "forth_core.s"

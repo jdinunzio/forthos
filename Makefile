@@ -7,6 +7,9 @@ naturaldocs = /usr/bin/naturaldocs
 
 .PHONY: docs
 
+.s.h:
+	grep '^def' $< | cut -d ',' -f 2 | sed -e 's/^/extern/' > $@
+
 .s.o:
 	$(asm) $(ASFLAGS) $<
 
@@ -25,7 +28,7 @@ image: kernel
 	-sudo umount /dev/loop0
 	-sudo losetup -d /dev/loop0 
 
-kernel.o: forth_words.s forth_core.s
+#kernel.o: forth_words.s forth_core.s
 
 run: image
 	qemu  -fda floppy.img  

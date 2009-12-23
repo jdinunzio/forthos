@@ -3,6 +3,8 @@
 ; by august0815
 ; 01.12.2009
 
+%include "ext2.s"
+
 section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
@@ -95,4 +97,4 @@ defword CLSSTACK,CLSSTACK	,0
 		
 
 	
-%include "rest.s"
+;%include "rest.s"

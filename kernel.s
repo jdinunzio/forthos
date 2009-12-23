@@ -5,10 +5,7 @@
 
 ; section:   Copyright (C) 2009 august0815
 
- 
-  
-%include "forth_words.s"
-;%include "kernel_video.s"
+%include "test.s"
 
 [BITS 32]
 defconst SCREEN, SCREEN, 0, 0xB8000

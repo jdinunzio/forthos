@@ -3,6 +3,8 @@
 ; by august0815
 ; 19.12.2009
 
+%include "ext1.s"
+
 section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
@@ -404,4 +406,4 @@ defword .AP, DOTAP ,0
 ;	THEN
 	dd EXIT		; EXIT		(return from FORTH word)
 
-%include "ext3.s"
+;%include "ext3.s"

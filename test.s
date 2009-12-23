@@ -1,3 +1,4 @@
+%include "rest.s"
 
 defword test , test ,0
       ;--------TESTING words------------------
@@ -59,3 +60,5 @@ defword within_test , within_test ,0
       dd DROP 
       dd CR
 dd EXIT		; EXIT		(return from FORTH word)
+
+;%include "kernel.s"

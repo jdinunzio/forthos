@@ -3,6 +3,8 @@
 ; by august0815
 ; 19.12.2009
 
+%include "ext.s"
+
 section .text
 ;;;;;;;;;;;;;; SOME WORDS
 
@@ -170,4 +172,4 @@ defword UNTIL,UNTIL,0
 	dd COMMA
 dd EXIT		; EXIT		(return from FORTH word)
 
-%include "ext2.s"
+;%include "ext2.s"

@@ -5,8 +5,6 @@
 ; This file is a translation of jonesforth 
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm.
 
-%ifndef forth_core
-%define forth_core
 %include "forth_macros.s"
 
 [BITS 32]
@@ -120,4 +118,5 @@ defcode EXIT, EXIT, 0
             POPRSP esi          ; Pops the address of the word to return to
             NEXT                ; and executes it
 
-%endif
+
+;%include "forth_words.s"
