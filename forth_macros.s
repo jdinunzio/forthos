@@ -21,17 +21,18 @@
             FF_IMMED    equ  0x80    ; Word is inmediate
             FF_HIDDEN   equ  0x20    ; Word is hidden
             FF_LENMASK  equ  0x1f    ;
-            %define LINK 0          ; Address of the last header word
+            %define LINK 0           ; Address of the last header word
 
 
 ; macro: NEXT
-; NEXT macro
-;  * Executes the next forth word.
-;  * esi points to the codeword of the next word to be executed. The 
-;  * codeword stores the address of the rutine that implements the forth word.
-;  * Increments esi to point to the next forth word, and jumps to the rutine.
+; Execute the next forth word.
+;
+; Every defcode (a forth word coded in assembly) must end with this macro.
+; It loads in eax the dword which address is in esi and increments esi.
+; Then, it jumps to the address in eax. In this way, esi always contains the
+; address of the next word to execute.
 %macro NEXT 0
-            lodsd
+            lodsd                   ; eax <- mem[esi], esi <- esi+4
             jmp [eax]
 %endmacro
 
@@ -152,7 +153,7 @@
 %endmacro
 
 ; macro:  LITN
-; Insert in forth word a literal value.
+; Insert in a forth word a literal value.
 ;
 ; Parametes:
 ; v - The literal value.
@@ -181,23 +182,32 @@
         dd %1 - $
 %endmacro
 
-; macro: IF
-; The IF part of the  cond IF ... ELSE ... THEN structure.
+; macro: if
+; The IF part of the if-else-the structure. 
+;
+; e.g.:
+; | cond if
+; | action_if_true else
+; | action_if_false then
+; 
+; or
+; | cond if
+; | action then
 %macro if 0
         %push if_cond
         zbranch %$ifnot
 %endmacro
 
-; macro: ELSE
-; The ELSE part of the  cond IF ... ELSE ... THEN structure.
+; macro: else
+; The ELSE part of the if-else-then structure.
 %macro else 0
         %repl else_cond
         branch %$exit
     %$ifnot:
 %endmacro
 
-; macro: THEN
-; The THEN part of the  cond IF ... ELSE ... THEN structure.
+; macro: then
+; The THEN part of the if-else-then structure.
 %macro then 0
         %ifctx if_cond
             %$ifnot:
@@ -206,10 +216,10 @@
         %pop 
 %endmacro
 
-; macro: DO
-; The DO part of end ini DO ... LOOP structure.
+; macro: do
+; The DO part of do-loop structure.
 ; 
-;  e.g :
+;  e.g.:
 ;  |        LITN 80*25              ; for i = 0 to 80*25
 ;  |        LITN 0                  ;
 ;  |        do
@@ -224,6 +234,8 @@
         zbranch %$exit
 %endmacro
 
+; macro: loop
+; The LOOP part of the do-loop structure.
 %macro loop 0
         dd INCR
         branch %$loop
@@ -233,44 +245,50 @@
 %endmacro
 
 
-; macro: BEGIN
-; the BEGIN part of the BEGIN ... cond UNTIL structure.
+; macro: begin
+; the BEGIN part of the begin-until structure.
+; 
+; e.g.:
+; | begin
+; |     actions
+; |     cond
+; | until
 %macro begin 0
         %push begin_loop
     %$loop:
 %endmacro
 
-; macro: UNTIL
-; the UNTIL part of the BEGIN ... cond UNTIL structure.
+; macro: until
+; the UNTIL part of the begin-until structure.
 %macro until 0
         zbranch %$loop
     %$exit:
         %pop
 %endmacro
 
-; macro: REPEAT
-; The WHILE part of the BEGIN cond WHILE ... REPEAT
+; macro: while
+; The WHILE part of the begin-while-repeat structure.
 ; 
 ;  e.g :
-;  |         begin
-;  |              dd DUP, FETCHBYTE, DUP
-;  |         while
-;  |              dd EMIT, INCR
-;  |         repeat
+;  | begin
+;  |    dd DUP, FETCHBYTE, DUP
+;  | while
+;  |    dd EMIT, INCR
+;  | repeat
 %macro while 0
         zbranch %$exit
 %endmacro
 
-; macro: REPEAT
-; The REPEAT part of the BEGIN cond WHILE ... REPEAT
+; macro: repeat
+; The REPEAT part of the begin-while-repeat structure.
 %macro repeat 0
         branch %$loop
     %$exit:
         %pop
 %endmacro
 
-; macro: LEAVE
-; You can always exit from a loop with LEAVE
+; macro: leave
+; Exit the current loop.
 %macro leave 0
         branch %$exit
         %pop

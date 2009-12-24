@@ -26,7 +26,7 @@ defcode STOP, STOP, 0
 ; Takes the next word (a literal value) in a word definition and stores it in the stack.
 ;
 ; Stack:
-; -- n
+;   -- n
 defcode LIT, LIT, 0
             lodsd               ; Load the next word in the current definition
             push eax            ; pushes it on the stack
@@ -34,14 +34,14 @@ defcode LIT, LIT, 0
             
 ; function: DROP 
 ; Stack:
-; n --
+;   n --
 defcode DROP, DROP,0
             pop eax       
             NEXT
 
 ; function: SWAP
 ; Stack:
-; a b -- b a
+;   a b -- b a
 defcode SWAP, SWAP,0
             pop eax       
             pop ebx
@@ -51,7 +51,7 @@ defcode SWAP, SWAP,0
 
 ; function: DUP
 ; Stack:
-; a -- a a
+;   a -- a a
 defcode DUP, DUP, 0
             mov eax, [esp]    
             push eax
@@ -59,7 +59,7 @@ defcode DUP, DUP, 0
 
 ; function: OVER
 ; Stack:
-; a b -- a b a
+;   a b -- a b a
 defcode OVER, OVER, 0
             mov eax, [esp + 4]   
             push eax      
@@ -67,7 +67,7 @@ defcode OVER, OVER, 0
 
 ; function: ROT
 ; Stack:
-; a b c -- c a b
+;   a b c -- c a b
 defcode ROT, ROT, 0
             pop eax
             pop ebx
@@ -77,9 +77,9 @@ defcode ROT, ROT, 0
             push ebx
             NEXT
 
-; function: -ROT
+; function: -ROT (NROT)
 ; Stack:
-; a b c -- b c a
+;   a b c -- b c a
 defcode -ROT, NROT, 0
             pop eax
             pop ebx
@@ -89,17 +89,17 @@ defcode -ROT, NROT, 0
             push ecx
             NEXT
 
-; function: 2DROP
+; function: 2DROP (TWODROP)
 ; Stack:
-; a b --
+;   a b --
 defcode 2DROP, TWODROP, 0
             pop eax
             pop eax
             NEXT
 
-; function: 2DUP
+; function: 2DUP (TWODUP)
 ; Stack:
-; a b -- a b a b
+;   a b -- a b a b
 defcode 2DUP, TWODUP, 0
             mov eax, [esp]
             mov ebx, [esp + 4]
@@ -107,9 +107,9 @@ defcode 2DUP, TWODUP, 0
             push eax
             NEXT
 
-; function: 2SWAP
+; function: 2SWAP (TWOSWAP)
 ; Stack:
-; a b c d -- c d a b
+;   a b c d -- c d a b
 defcode 2SWAP, TWOSWAP, 0
             pop eax
             pop ebx
@@ -121,11 +121,12 @@ defcode 2SWAP, TWOSWAP, 0
             push ecx
             NEXT
 
-; function: ?DUP
-; Consume if the top of the stack is zero.
+; function: ?DUP (QDUP)
+;   Consume if the top of the stack is zero.
+;
 ; Stack:
-; 0 --
-; n -- n
+;   0 --
+;   n -- n
 defcode ?DUP, QDUP, 0
             mov eax, [esp]
             test eax, eax
@@ -133,54 +134,53 @@ defcode ?DUP, QDUP, 0
             push eax
 .1: NEXT
 
-; function: 1+
+; function: 1+ (INCR)
 ; Stack:
-; n -- n+1
+;   n -- n+1
 defcode 1+, INCR, 0
-            ; ( n -- n+1 )
             inc dword [esp]    
             NEXT
 
-; function: 1-
+; function: 1- (DECR)
 ; Stack:
-; n -- n-1
+;   n -- n-1
 defcode 1-, DECR, 0
             dec dword [esp]    
             NEXT
 
-; function: 4+
+; function: 4+ (INCR4)
 ; Stack:
-; n -- n+4
+;   n -- n+4
 defcode 4+, INCR4, 0
             add dword [esp], 4     
             NEXT
 
-; function: 4-
+; function: 4- (DECR4)
 ; Stack:
-; n -- n-4
+;   n -- n-4
 defcode 4-, DECR4, 0
             sub dword [esp], 4     
             NEXT
 
-; function: +
+; function: + (ADD)
 ; Stack:
-; a b -- a+b
+;   a b -- a+b
 defcode +, ADD, 0
             pop eax       
             add [esp], eax   
             NEXT
 
-; function: -                                                                   
+; function: - (SUB)                                                             
 ; Stack:
-; a b -- b-a
+;   a b -- b-a
 defcode -, SUB, 0
             pop eax       
             sub [esp], eax   
             NEXT
 
-; function: *
+; function: * (MUL)
 ; Stack:
-; a b -- a*b
+;   a b -- a*b
 defcode *, MUL, 0
             pop eax
             pop ebx
@@ -193,9 +193,9 @@ defcode *, MUL, 0
 ;            terms of the primitive /MOD.  The design of the i386 assembly instruction idiv which
 ;            leaves both quotient and remainder makes this the obvious choice.
 
-; function: /MOD
+; function: /MOD (DIVMOD)
 ; Stack:
-; a b -- a%b a/b
+;   a b -- a%b a/b
 defcode /MOD, DIVMOD, 0
             xor edx, edx
             pop ebx
@@ -205,9 +205,9 @@ defcode /MOD, DIVMOD, 0
             push eax      
             NEXT
 
-; function: /
+; function: / (DIV)
 ; Stack:
-; a b -- a/b
+;   a b -- a/b
 defword /, DIV, 0
             dd DIVMOD
             dd SWAP
@@ -216,16 +216,16 @@ defword /, DIV, 0
 
 ; function: MOD
 ; Stack:
-; a b -- a%b
+;   a b -- a%b
 defword MOD, MOD, 0
             dd DIVMOD
             dd DROP
             dd EXIT
 
 ; Comparisons
-; function: =
+; function: = (EQU)
 ; Stack:
-; --
+;  n -- bool
 defcode =, EQU, 0
             pop eax
             pop ebx
@@ -235,9 +235,9 @@ defcode =, EQU, 0
             push eax
             NEXT
 
-; function: <>
+; function: <> (NEQU)
 ; Stack:
-; --
+;  n -- bool
 defcode <>, NEQU, 0
             pop eax
             pop ebx
@@ -247,9 +247,9 @@ defcode <>, NEQU, 0
             push eax
             NEXT
 
-; function: <
+; function: < (LT)
 ; Stack:
-; --
+;   n -- bool
 defcode <, LT, 0
             pop eax
             pop ebx
@@ -259,9 +259,9 @@ defcode <, LT, 0
             push eax
             NEXT
 
-; function: >
+; function: > (GT)
 ; Stack:
-; --
+;   n -- bool
 defcode >, GT, 0
             pop eax
             pop ebx
@@ -271,9 +271,9 @@ defcode >, GT, 0
             push eax
             NEXT
 
-; function: <=
+; function: <= (LE)
 ; Stack:
-; --
+;   n -- bool
 defcode <=, LE, 0
             pop eax
             pop ebx
@@ -283,9 +283,9 @@ defcode <=, LE, 0
             push eax
             NEXT
 
-; function: >=
+; function: >= (GE)
 ; Stack:
-; --
+;   n -- bool
 defcode >=, GE, 0
             pop eax
             pop ebx
@@ -295,9 +295,9 @@ defcode >=, GE, 0
             push eax
             NEXT
 
-; function: 0=
+; function: 0= (ZEQU)
 ; Stack:
-; --
+;   n -- bool
 defcode 0=, ZEQU, 0
             pop eax
             test eax, eax
@@ -306,9 +306,9 @@ defcode 0=, ZEQU, 0
             push eax
             NEXT
 
-; function: 0<>
+; function: 0<> (ZNEQU)
 ; Stack:
-; --
+;  n -- bool
 defcode 0<>, ZNEQU, 0
             pop eax
             test eax, eax
@@ -317,9 +317,9 @@ defcode 0<>, ZNEQU, 0
             push eax
             NEXT
 
-; function: 0<
+; function: 0< (ZLT)
 ; Stack:
-; --
+;   n -- bool
 defcode 0<, ZLT, 0
             pop eax
             test eax, eax
@@ -328,9 +328,9 @@ defcode 0<, ZLT, 0
             push eax
             NEXT
 
-; function: 0>
+; function: 0> (ZGT)
 ; Stack:
-; --
+;   n -- bool
 defcode 0>, ZGT, 0
             pop eax
             test eax, eax
@@ -339,9 +339,9 @@ defcode 0>, ZGT, 0
             push eax
             NEXT
 
-; function: 0<=
+; function: 0<= (ZLE)
 ; Stack:
-; --
+;   n -- bool
 defcode 0<=, ZLE, 0
             pop eax
             test eax, eax
@@ -350,9 +350,9 @@ defcode 0<=, ZLE, 0
             push eax
             NEXT
 
-; function: 0>=
+; function: 0>= (ZGE)
 ; Stack:
-; --
+;   n -- bool
 defcode 0>=, ZGE, 0
             pop eax
             test eax, eax
@@ -363,16 +363,15 @@ defcode 0>=, ZGE, 0
 
 ; function: AND
 ; Stack:
-; a b -- a&b
+;   a b -- a&b
 defcode AND, AND, 0   
             pop eax
             and [esp], eax
             NEXT
 
 ; function: OR
-
 ; Stack:
-; a b -- a|b
+;   a b -- a|b
 defcode OR, OR, 0 
             pop eax
             or [esp], eax
@@ -380,7 +379,7 @@ defcode OR, OR, 0
 
 ; function: XOR
 ; Stack:
-; a b -- (a xor b)
+;   a b -- (a xor b)
 defcode XOR, XOR, 0   
             pop eax
             xor [esp], eax
@@ -388,72 +387,72 @@ defcode XOR, XOR, 0
 
 ; function: INVERT
 ; Stack:
-; a -- !a
+;   a -- !a
 defcode INVERT, INVERT, 0
             not dword [esp]
             NEXT
 
 ; Memory
-; function: !
-; Stores a value in an address.
+; function: ! (STORE)
+;   Stores a value in an address.
 ;
 ; Stack:
-; n addr --
+;   n addr --
 defcode !, STORE, 0
             pop ebx       
             pop eax       
             mov [ebx], eax    
             NEXT
 
-; function: @
-; Gets the value in an address
+; function: @ (FETCH)
+;   Gets the value in an address
 ;
 ; Stack:
-; addr -- v
+;   addr -- v
 defcode @, FETCH, 0
             pop ebx       
             mov eax, [ebx]    
             push eax      
             NEXT
 
-; function: +!
-; Add a value to the content of an address.
+; function: +! (ADDSTORE)
+;   Add a value to the content of an address.
 ;
 ; Stack:
-; v addr --
+;   v addr --
 defcode +!, ADDSTORE, 0
             pop ebx       
             pop eax       
             add [ebx], eax   
             NEXT
 
-; function: -!
-; Substract a value to the content of an address.
+; function: -! (SUBSTORE)
+;   Substract a value to the content of an address.
 ;
 ; Stack:
-; v addr --
+;   v addr --
 defcode -!, SUBSTORE, 0
             pop ebx       
             pop eax       
             sub [ebx], eax   
             NEXT
 
-; function: C!
-; Store a byte in an address.
+; function: C! (STOREBYTE)
+;   Store a byte in an address.
 ;
 ; Stack:
-; b addr --
+;   b addr --
 defcode C!, STOREBYTE, 0
             pop ebx       
             pop eax       
             mov [ebx], al    
             NEXT
 
-; function: C@
-; Fetchs a byte from an address.
+; function: C@ (FETCHBYTE)
+;   Fetchs a byte from an address.
 ;
 ; Stack:
-; addr -- b
+;   addr -- b
 defcode C@, FETCHBYTE, 0
             pop ebx       
             xor eax, eax
@@ -461,22 +460,22 @@ defcode C@, FETCHBYTE, 0
             push eax      
             NEXT
 
-; function: W!
-; Store a word in an address.
+; function: W! (STOREWORD)
+;   Store a word in an address.
 ;
 ; Stack:
-; w addr --
+;   w addr --
 defcode W!, STOREWORD, 0
             pop ebx       
             pop eax       
             mov [ebx], ax    
             NEXT
 
-; function: W@
-; Fetchs a word form an address.
+; function: W@ (FETCHWORD)
+;   Fetchs a word form an address.
 ;
 ; Stack:
-; addr -- w
+;   addr -- w
 defcode W@, FETCHWORD, 0
             pop ebx       
             xor eax, eax
@@ -484,11 +483,11 @@ defcode W@, FETCHWORD, 0
             push eax      
             NEXT
 
-; C@C! is a useful byte copy primitive. */
-; function: C@C!
+; function: C@C! (CCOPY)
+;   Copy a byte from an address to another and increments both addresses.
 ;
 ; Stack:
-; --
+;   &src &dst -- (&src+1) (&dst+1)
 defcode C@C!, CCOPY, 0
             mov ebx, [esp + 4]  	;movl 4(%esp),%ebx	// source address
             mov al, [ebx]    		;movb (%ebx),%al		// get source character
@@ -499,7 +498,7 @@ defcode C@C!, CCOPY, 0
             NEXT
 
 ; function: CMOVE
-; Block copy.
+;   Block copy.
 ;
 ; Stack:
 ; --
@@ -512,7 +511,7 @@ defcode CMOVE, CMOVE, 0
             mov esi, edx      
             NEXT
 
-; function:  >R  Return Stack
+; function:  >R (TOR)
 ;
 ; Stack:
 ; --
@@ -521,7 +520,7 @@ defcode CMOVE, CMOVE, 0
             PUSHRSP eax       
             NEXT
 
-; function: R>
+; function: R> (FROMR)
 ;
 ; Stack:
 ; --
@@ -530,7 +529,7 @@ defcode R>, FROMR, 0
             push eax      
             NEXT
 
-; function: RSP@
+; function: RSP@ (RSPFETCH)
 ;
 ; Stack:
 ; --
@@ -538,7 +537,8 @@ defcode RSP@, RSPFETCH, 0
             push ebp
             NEXT
 
-; function: RSP!
+; function: RSP! (RSPSTORE)
+;   Pops the return stack and trow away.
 ;
 ; Stack:
 ; --
@@ -556,17 +556,27 @@ defcode RDROP, RDROP, 0
 
 ; Branching
 ; function: BRANCH
+;   Unconditional relative branch.
+;
+; The next codeword is a literal which indicate how many bytes (positive
+; or negative) it is going to jump. So, to jump four word ahead, the literal
+; must be 8*4=32.
 ;
 ; Stack:
-; --
+;   --
 defcode BRANCH, BRANCH, 0
             add esi, [esi]
             NEXT
 
-; function: 0BRANCH
+; function: 0BRANCH (ZBRANCH)
+;   branch if zero.
+;
+; The next codeword is a literal which indicate how many bytes (positive
+; or negative) it is going to jump. So, to jump four word ahead, the literal
+; must be 8*4=32.
 ;
 ; Stack:
-; --
+;   n --
 defcode 0BRANCH, ZBRANCH, 0
             pop eax
             test eax, eax
@@ -575,7 +585,7 @@ defcode 0BRANCH, ZBRANCH, 0
             NEXT
 
 ; Data stack manipulation
-; function: DSP@
+; function: DSP@ (DSPFETCH)
 ;
 ; Stack:
 ; --
@@ -584,7 +594,7 @@ defcode DSP@, DSPFETCH, 0
     push eax
     NEXT
 
-; function: DSP!
+; function: DSP! (DSPSTORE)
 ;
 ; Stack:
 ; --
@@ -592,11 +602,11 @@ defcode DSP!, DSPSTORE, 0
     pop esp
     NEXT
 
-; Shift and Rotate
 ; function: SHL
+;   Shift to the left
 ;
 ; Stack:
-; --
+;   n1 n2 -- n1 << n2
 defcode SHL, SHL, 0
     ; ( n1 n2 -- n1 << n2)
     pop ecx
@@ -606,11 +616,11 @@ defcode SHL, SHL, 0
     NEXT
 
 ; function: SHR
+;   Shift to the right
 ;
 ; Stack:
-; --
+;   n1 n2 -- n1 >> n2
 defcode SHR, SHR, 0
-    ; ( n1 n2 -- n1 >> n2)
     pop ecx
     pop eax
     shr eax, cl
@@ -618,12 +628,11 @@ defcode SHR, SHR, 0
     NEXT
 
 ; function: N_BYTE
+;   Gives the n-th byte of a cell
 ;
 ; Stack:
-; --
+;   b3b2b1b0 n -- bn
 defword N_BYTE, N_BYTE, 0
-    ; Gives the n-th byte of a cell
-    ; ( b3b2b1b0 n -- bn)
     LITN 8
     dd MUL
     dd SHR

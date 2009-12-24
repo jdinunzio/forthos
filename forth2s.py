@@ -171,9 +171,9 @@ def get_symbols():
         dct[key] = val
     return dct
 
-# Use this version of TRANSLATIONS for compile recursive definitions
+# Use this version for compile recursive definitions
 TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_macro, tr_symbol, tr_id]
-# Use this version of TRANSLATIONS to detect bogus words
+# Use this version to detect bogus words
 # TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_macro, tr_symbol]
 MACROS = commands.getoutput("grep -r '%macro' *s | awk '{print $2}'").split()
 SYMBOLS = get_symbols()

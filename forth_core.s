@@ -121,7 +121,7 @@ DOCOL:
             NEXT
 
 ; function: EXIT
-;   EXIT is the last word of a forth word (a non-defcode word). It restores the 
+;   EXIT is the last word of a defword (a non-defcode word). It restores the 
 ;   value of esi, stored in the return stack by DOCOL when this word started.
 defcode EXIT, EXIT, 0
             POPRSP esi          ; Pops the address of the word to return to
