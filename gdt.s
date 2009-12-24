@@ -1,7 +1,14 @@
-; Sets the global descritor table
+; program: gdt.s
+; Initialize the GDT.
+
+; License: GPL
+; José Dinuncio <jdinunci@uc.edu.ve>, 12/2009.
+; This file is based on Bran's kernel development tutorial file start.asm
+
 
 [BITS 32]
-
+; macro: gdt_entry
+; Create a gtd_entry structure
 %macro gdt_entry 4
             section .rodata
             ; dh base, dh limit, db access, db gran
@@ -13,17 +20,22 @@
             db %1 >> 24 & 0xff                      ; byte base_high
 %endmacro
 
+; type: gdtable
+; GDT
 gdtable:
             gdt_entry 0, 0, 0, 0
             gdt_entry 0, 0xFFFFFFFF, 0x9A, 0xCF
             gdt_entry 0, 0xFFFFFFFF, 0x92, 0xCF
 
+; type: gdt_pointer
+; Pointer to the gdt
 gdt_pointer:
             dw 8*3 -1           ; Limit
             dd gdtable          ; Base
 
-
-[GLOBAL gdt_flush]
+; function: gdt_flush
+; Initialize the GDT
+global gdt_flush
 gdt_flush:
             sgdt [gdt_pointer]
             mov ax, 0x10      
@@ -35,4 +47,3 @@ gdt_flush:
             jmp 0x08:flush2 
 flush2:
             ret
- 

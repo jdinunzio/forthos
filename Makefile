@@ -1,5 +1,5 @@
 KERNEL_OBJS = boot.o gdt.o idt.o 
-FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel.o 
+FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel_kbd.o test.o kernel.o 
 FORTH_INC = forth_core.h forth_words.h kernel_words.h kernel_video.h 
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32
@@ -7,6 +7,10 @@ asm = nasm
 naturaldocs = /usr/bin/naturaldocs
 
 .PHONY: docs
+.SUFFIXES: .fth
+
+.fth.s:
+	./forth2s.py -i $< -o $@
 
 .s.h:
 	grep '^defvar' $< | cut -d ',' -f 2 | sed -e 's/ */var_/' > $@.tmp

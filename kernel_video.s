@@ -1,4 +1,9 @@
-; file: kernel_video
+; program: kernel_video
+; Words related to screen driver.
+
+; License: GPL
+; José Dinuncio <jdinunci@uc.edu.ve>, 12/2009.
+; This file is based on Bran's kernel development tutorial file start.asm
 
 %include "forth.h"
 %include "kernel_words.h"
@@ -16,7 +21,11 @@ defvar SCREEN_COLOR, SCREEN_COLOR, 0, 0x0f00
 defvar KEYBUFF , KEYBUFF , 0 , 0
 
 section .text
-;defword AT_HW
+; function: AT_HW
+; Moves the cursor to the position indicated by CURSOR_POS variables.
+;
+; Stack:
+; --
 defword: AT_HW, AT_HW, 0
             dd CURSOR_POS_REL
             LITN 14             ; Tell we'll send high byte of position
@@ -38,15 +47,23 @@ defword: AT_HW, AT_HW, 0
             dd OUTB             ;
             dd EXIT
 
-;defword: atx
+; function: atx
+; Moves the cursor thoe the coordinates indicated. It updates the CURSOR_POS
+; variables.
+; 
+; Stack:
+; y x --
 defword atx, atx, 0
-            ; ( y:line x:col -- )
             dd CURSOR_POS_X, STORE
             dd CURSOR_POS_Y, STORE
             dd AT_HW
             dd EXIT
 
-;defcode: INK
+; function: INK
+; Set the ink color.
+;
+; Stack:
+; color --
 defcode INK, INK, 0
             ; ( ink -- )
             pop eax
@@ -58,7 +75,10 @@ defcode INK, INK, 0
             mov [var_SCREEN_COLOR], eax
             NEXT
 
-;defcode: BG
+; function: BG
+; Sets the background color.
+;
+; color --
 defcode BG, BG, 0
             ; ( ink -- )
             pop eax
@@ -70,7 +90,14 @@ defcode BG, BG, 0
             mov [var_SCREEN_COLOR], eax
             NEXT
 
-;defcode: C>CW, CHAR_TO_CHARWORD
+; function: C>CW, CHAR_TO_CHARWORD
+; Converts a character in a charword.
+;
+; A charword is a 16bits word with information about the character to be 
+; printed and its colors.
+;
+; Stack:
+; char -- charword
 defcode C>CW, CHAR_TO_CHARWORD, 0
             ; Converts a character in a charword (attributes+character)
             ; ( char -- charword )
@@ -82,16 +109,23 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
             push eax
             NEXT
 
-;defword:  BRIGHT
+; function:  BRIGHT
+; Takes a color and returns its brighter version.
+;
+; Stack:
+; color -- color
 defword BRIGHT, BRIGHT, 0
             dd LIT
             dd 8
             dd ADD
             dd EXIT
 
-;defword: CURSOR_POS_REL
+; function: CURSOR_POS_REL
+; Returns the cursor relative position respect to the origin of the screen
+;
+; Stack
+; -- cursor_pos_rel
 defword CURSOR_POS_REL, CURSOR_POS_REL, 0
-            ; ( -- cursorpos)
             dd CURSOR_POS_Y, FETCH
             LITN 160
             dd MUL
@@ -101,19 +135,27 @@ defword CURSOR_POS_REL, CURSOR_POS_REL, 0
             dd ADD
             dd EXIT
 
-;defword: CURSOR_POS
+; function: CURSOR_POS
+; Returns the absolute address of the cursor.
+;
+; Stack
+; -- cursor_pos
 defword CURSOR_POS, CURSOR_POS, 0
             dd CURSOR_POS_REL
             dd SCREEN   ; constante
             dd ADD
             dd EXIT
 
-;defcode: SCREEN_SCROLL
+; funnREEN_SCROLL
 defcode SCREEN_SCROLL, SCREEN_SCROLL, 0
             ;call vScrollUp
             dd NEXT
 
-;defword: SCREEN_SCROLL_
+; function: SCREEN_SCROLL_
+; Scrolls the screen if the cursor goes beyond line 25.
+;
+; Stack:
+; --
 defword SCREEN_SCROLL_, SCREEN_SCROLL_, 0
             dd CURSOR_POS_Y, FETCH
             LITN 25
@@ -125,7 +167,11 @@ defword SCREEN_SCROLL_, SCREEN_SCROLL_, 0
             then
             dd EXIT
 
-;defword: CURSOR_FORWARD
+; function: CURSOR_FORWARD
+; Moves the cursor forward.
+;
+; Stack:
+; --
 defword CURSOR_FORWARD, CURSOR_FORWARD, 0
             LITN 1
             dd CURSOR_POS_X, ADDSTORE
@@ -138,23 +184,32 @@ defword CURSOR_FORWARD, CURSOR_FORWARD, 0
             dd AT_HW
             dd EXIT
 
-;defword: EMITCW
+; function: EMITCW
+; Prinst a character word
+;
+; Stack:
+; charword --
 defword EMITCW, EMITCW, 0
-            ; prints a charword (attributes+character)
-            ; ( charword -- )
             dd CURSOR_POS
             dd STOREWORD
             dd CURSOR_FORWARD
             dd EXIT
 
-;defword: EMIT
+; function: EMIT
+; Prinst a character.
+;
+; Stack:
+; char --
 defword EMIT , EMIT , 0
-            ; ( char -- )
             dd CHAR_TO_CHARWORD
             dd EMITCW
             dd EXIT
 
-;defword: PRINTCSTRING
+; function: PRINTCSTRING
+; Prints a C string
+;
+; Stack:
+; &string --
 defword PRINTCSTRING, PRINTCSTRING, 0
             ; ( &cstring -- )
             begin
@@ -165,7 +220,11 @@ defword PRINTCSTRING, PRINTCSTRING, 0
             dd DROP, DROP
             dd EXIT
             
-;defword: CLEAR            
+; function: CLEAR 
+; Clear the screen
+;
+; Stack:
+; char --
 defword CLEAR, CLEAR, 0
             LITN 0                  ; Cursor at 0,0
             LITN 0                  ;
@@ -181,7 +240,11 @@ defword CLEAR, CLEAR, 0
             dd atx                  ;
             dd EXIT
 
-;defword: CR            
+; function: CR            
+; Prints a CR
+;
+; Stack:
+;  --
 defword CR, CR , 0 ; TESTED_OK
 			LITN 1
             dd CURSOR_POS_Y, ADDSTORE
@@ -191,18 +254,15 @@ defword CR, CR , 0 ; TESTED_OK
 		 	dd EXIT
 		 	
 
-;defword: TAB
+; function: TAB
+; Prints a TAB.
+;
+; Stack:
+; --
 defword TAB , TAB ,0	
 			LITN 8
             dd CURSOR_POS_X, ADDSTORE
 			dd AT_HW
 			dd EXIT		
 
-; TODO: TEST, removeme
-defword MAIN, MAIN, 0
-            LITN hello
-            dd PRINTCSTRING
-always:     branch always
 
-section .rodata
-hello:  db "hello, world", 0

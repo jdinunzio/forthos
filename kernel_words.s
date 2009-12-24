@@ -1,9 +1,8 @@
-; file: kernel_words
-; by: José Dinuncio <jdinunci@uc.edu.ve>
-; 12.2009 
+; program: kernel_words
+; Useful words for kernel management.
 
-; Topic: kernel_words
-; Define the main words used by the kernel OS.
+; License: GPL
+; José Dinuncio <jdinunci@uc.edu.ve>, 12/2009.
 
 %include "forth.h"
 
@@ -27,7 +26,7 @@ defcode OUTB, OUTB, 0
 ; Executes an IN assembly instruction
 ;
 ; Stack:
-; -- val
+; port -- val
 defcode INB, INB, 0
         pop edx
         xor eax, eax

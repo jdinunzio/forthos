@@ -1,9 +1,12 @@
 ; program: forth_core
-;
-; myforth: My own forth system.
+; The core functions of the forth interpreter.
 ;
 ; This file is a translation of jonesforth 
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm.
+
+; License: GPL
+; José Dinuncio <jdinunci@uc.edu.ve>, 12/2009.
+; This file is based on Bran's kernel development tutorial file start.asm
 
 %include "forth_macros.s"
 extern MAIN
@@ -48,49 +51,61 @@ extern MAIN
 ; one by one the words on the current word body. The word body must end with
 ; the EXIT word to restore the address of the next word to execute.
 
-
-
 ; ============================================================================
-;    Virtual Machine
+;    Virtual Machine Variables
 ; ============================================================================
-
-;  Virtual Machine variables
-; var: STATE       Is the interpreter executing code (0) or compiling (non-zero)?
+; var: STATE       
+; Is the interpreter executing code (0) or compiling (non-zero)?
 defvar STATE, STATE, 0, 0
 
-; var: HERE        Points to the next free byte of memory.
+; var: HERE        
+; Points to the next free byte of memory.
 defvar HERE, HERE, 0, 0
 
-; var LATEST       Points to the newset  word in the dictionary.
+; var LATEST       
+; Points to the newset  word in the dictionary.
 defvar LATEST, LATEST, 0, MAIN ; SYSCALL0 must be last in built-in dictionary
 
-; var: S0          Stores the address of the top of the parameter stack.
+; var: S0          
+; Stores the address of the top of the parameter stack.
 defvar S0, S0, 0, 0
 
-; var: BASE        The current base for printing and reading numbers.
+; var: BASE        
+; The current base for printing and reading numbers.
 defvar BASE, BASE, 0, 10
 
 
-;  Virtual Machine constants
-; const: VERSION     Is the current version of this FORTH.
+; ============================================================================
+;       Virtual Machine constants
+; ============================================================================
+; const: VERSION
+; The current version of this FORTH.
 defconst VERSION, VERSION, 0, 1
 
-; const: R0          The address of the top of the return stack.
+; const: R0          
+; The address of the top of the return stack.
 defconst R0, R0, 0, 2
 
-; const: DOCOL       Pointer to DOCOL.
+; const: DOCOL       
+; Pointer to DOCOL.
 defconst DOCOL, __DOCOL, 0, DOCOL
 
-; const: F_IMMED     The IMMEDIATE flag's actual value.
+; const: F_IMMED     
+; The IMMEDIATE flag's actual value.
 defconst F_IMMED, __F_IMMED, 0, 0x80
 
-; const: F_HIDDEN    The HIDDEN flag's actual value.
+; const: F_HIDDEN    
+; The HIDDEN flag's actual value.
 defconst F_HIDDEN, __F_HIDDEN, 0, 0x20
 
-; const: F_LENMASK   The length mask in the flags/len byte.
+; const: F_LENMASK   
+;The length mask in the flags/len byte.
 defconst F_LENMASK, __F_LENMASK, 0, 0x1f
 
 
+; ============================================================================
+;       Virtual Machine main functions
+; ============================================================================
 section .text
 align 4
 

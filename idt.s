@@ -1,10 +1,21 @@
+; program: idt.s
+; Initialize the IDT.
+;
 ; Sets:
 ;   *) The interruption descriptor table
+;
 ;   *) The 32 CPU exception handlers
+;
 ;   *) The 16 PIC interrupts
+
+; License: GPL
+; José Dinuncio <jdinunci@uc.edu.ve>, 12/2009.
+; This file is based on Bran's kernel development tutorial file start.asm
 
 [BITS 32]
 
+; macro: idt_entry
+; Create a idt_entry
 %macro idt_entry 3
             ; base, sel, flags
             %xdefine base %1
@@ -27,17 +38,34 @@
             mov [ebx], ax
 %endmacro
 
+; macro: isr_wo_error
+; Generate code to handle an ISR without error.
+;
+; It pushes the error code 0, the id of this ISR and then calls
+; to the isr_routine handler.
+;
+; Params:
+; id - The id of this ISR
 %macro isr_wo_error 1
             push byte 0
             push byte %1
             jmp isr_routine
 %endmacro
 
+; macro: isr_with_error
+; Generate code to handle an ISR with error.
+;
+; It pushes the id for this ISR and then calls 
+; to the isr_routine handler.
+;
+; Params:
+; id - The id of this ISR
 %macro isr_with_error 1
             push byte %1
             jmp isr_routine
 %endmacro
 
+; macro: irq_handler
 %macro irq_handler 1
             cli
             push byte 0
@@ -45,7 +73,9 @@
             jmp irq_routine
 %endmacro
 
-[GLOBAL idt_load]
+; function: idt_load
+; Initialize the IDT
+global idt_load
 idt_load:
             set_idt idtable, isr0
             set_idt idtable + 8, isr1
@@ -103,11 +133,14 @@ idt_load:
 
 
 section .data
+; type: idt_pointer
+; Pointer to the IDT
 idt_pointer:
             dw 8*256 -1    ; table limit
             dd idtable      ; table base
     
-
+; type: idtable
+; IDT
 idtable:
              idt_entry 0, 0x08, 0x8E            
              idt_entry 0, 0x08, 0x8E            
@@ -158,6 +191,8 @@ idtable:
              idt_entry 0, 0x08, 0x8E            
              idt_entry 0, 0x08, 0x8E            
              idt_entry 0, 0x08, 0x8E            
+
+
 section .text
 
 isr0:       isr_wo_error 0      ;  Division By Zero Exception, No
@@ -212,6 +247,7 @@ isr45:      irq_handler 45
 isr46:      irq_handler 46      
 isr47:      irq_handler 47      
 
+; function isr_routine
 isr_routine:
     pusha
     push ds
@@ -238,6 +274,7 @@ isr_routine:
     add esp, 8     ; Cleans up the pushed error code and pushed ISR number
     iret 
 
+; function: irq_routine
 irq_routine:
     pusha
     push ds
