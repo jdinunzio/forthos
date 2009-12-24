@@ -1,9 +1,13 @@
 ; file: kernel_kbd
+; by: José Dinuncio <jdinunci@uc.edu.ve>
+; 12.2009 
 
 ; Topic: kernel_kbd
-; This file defines the words to manipulate the keyboard
+; Define the words related to keyboard
 
-%include "kernel_video.s"
+%include "forth.h"
+%include "kernel_words.h"
+%include "kernel_video.h"
 
 [BITS 32]
 ;THIS IS CODE FORM retro8 by crc
@@ -110,4 +114,9 @@ shift:
   db 0,'ASDFGHJKL:"~'		        ;1D-29
   db -1,"|ZXCVBNM<>?",-1,"=",0,32,-2    ;2A-3A
 
-;%include "ext.s"
+;THIS IS CODE FORM retro8 by crc end
+;---------------------------------------------------------------
+video_base:     dd      0xB8000
+video_width:    dd      80
+video_height:   dd      25
+

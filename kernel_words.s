@@ -1,9 +1,11 @@
 ; file: kernel_words
+; by: José Dinuncio <jdinunci@uc.edu.ve>
+; 12.2009 
 
-; Topicc: kernel_words
-; This file defines the main words used by the kernel OS.
+; Topic: kernel_words
+; Define the main words used by the kernel OS.
 
-%include "forth_words.s"
+%include "forth.h"
 
 [BITS 32]
 ; function: OUTB
@@ -16,10 +18,20 @@
 ; val - The value to out. Byte.
 ; port - The port to output the value. int16.
 defcode OUTB, OUTB, 0
-            ; ( val addr -- )
-            pop edx
-            pop eax
-            out dx, al
-            NEXT
+        pop edx
+        pop eax
+        out dx, al
+        NEXT
 
-;%include "kernel_video.s"
+; function: INB
+; Executes an IN assembly instruction
+;
+; Stack:
+; -- val
+defcode INB, INB, 0
+        pop edx
+        xor eax, eax
+        in  al, dx
+        push eax
+        NEXT
+

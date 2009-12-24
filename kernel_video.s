@@ -1,17 +1,11 @@
 ; file: kernel_video
 
-%include "kernel_words.s"
+%include "forth.h"
+%include "kernel_words.h"
 
 [BITS 32]
-;defcode OUTB, OUTB, 0
-;            ; ( val addr -- )
-;            pop edx
-;            pop eax
-;            out dx, al
-;            NEXT
-		
-; Screen words
-;defconst SCREEN, SCREEN, 0, 0xB8000
+; var: SCREEN
+defconst SCREEN, SCREEN, 0, 0xB8000
 ; var: CURSOR_POS_X
 defvar CURSOR_POS_X, CURSOR_POS_X, 0 , 0
 ; var: CURSOR_POS_Y
@@ -187,9 +181,6 @@ defword CLEAR, CLEAR, 0
             dd atx                  ;
             dd EXIT
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; new code
-            
 ;defword: CR            
 defword CR, CR , 0 ; TESTED_OK
 			LITN 1
@@ -207,10 +198,11 @@ defword TAB , TAB ,0
 			dd AT_HW
 			dd EXIT		
 
-;THIS IS CODE FORM retro8 by crc end
-;---------------------------------------------------------------
-video_base:     dd      0xB8000
-video_width:    dd      80
-video_height:   dd      25
+; TODO: TEST, removeme
+defword MAIN, MAIN, 0
+            LITN hello
+            dd PRINTCSTRING
+always:     branch always
 
-;%include "kernel_kbd.s"	  ; the new files for include		
+section .rodata
+hello:  db "hello, world", 0

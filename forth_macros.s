@@ -13,6 +13,14 @@
 ; autodoc with NaturalDocs 19.12.2009
 
 [BITS 32]
+
+; word flags
+            FF_IMMED    equ  0x80    ; Word is inmediate
+            FF_HIDDEN   equ  0x20    ; Word is hidden
+            FF_LENMASK  equ  0x1f    ;
+            %define LINK 0          ; Address of the last header word
+
+
 ; define: NEXT macro
 ; NEXT macro
 ;  * Executes the next forth word.
@@ -115,6 +123,7 @@
             NEXT
     section .data
             align 4
+    global var_%2
     var_%2:
             dd %4
 %endmacro
@@ -131,6 +140,7 @@
             push %4
             NEXT
 %endmacro
+
 ; define:  LITN  Literal value
 ; Literal value
 %macro LITN 1
@@ -229,4 +239,3 @@
         %pop
 %endmacro
 
-;%include "forth_core.s"

@@ -4,7 +4,9 @@
 ; This file is a translation of jonesforth
 ; [http:;www.annexia.org/_file/jonesforth.s.txt] for being compiled with nasm
 
-%include "forth_core.s"
+%include "forth_macros.s"
+%include "forth_core.h"
+extern DOCOL
 
 [BITS 32]
 ; forthword ptrs contains the basic words of a forth interpreter. The escential
@@ -472,4 +474,3 @@ defword N_BYTE, N_BYTE, 0
     dd AND
     dd EXIT
 
-;%include "kernel_words.s"

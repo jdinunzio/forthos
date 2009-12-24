@@ -6,9 +6,10 @@
 ; (http://www.annexia.org/_file/jonesforth.s.txt) for being compiled with nasm.
 
 %include "forth_macros.s"
+extern MAIN
 
 [BITS 32]
-; Topic: Introduction
+; Topic: forth core
 ; Forth is an extensible, powerfull concatenative language/environment. This
 ; file contains the core routines needed for a minimal functional forth
 ; environment.
@@ -53,49 +54,41 @@
 ;    Virtual Machine
 ; ============================================================================
 
-; word flags
-            F_IMMED    equ  0x80    ; Word is inmediate
-            F_HIDDEN   equ  0x20    ; Word is hidden
-            F_LENMASK  equ  0x1f    ;
-            %define LINK 0          ; Address of the last header word
-
 ;  Virtual Machine variables
-
 ; var: STATE       Is the interpreter executing code (0) or compiling (non-zero)?
-
-; var LATEST       Points to the newset  word in the dictionary.
+defvar STATE, STATE, 0, 0
 
 ; var: HERE        Points to the next free byte of memory.
+defvar HERE, HERE, 0, 0
+
+; var LATEST       Points to the newset  word in the dictionary.
+defvar LATEST, LATEST, 0, MAIN ; SYSCALL0 must be last in built-in dictionary
 
 ; var: S0          Stores the address of the top of the parameter stack.
+defvar S0, S0, 0, 0
 
 ; var: BASE        The current base for printing and reading numbers.
+defvar BASE, BASE, 0, 10
 
-            defvar STATE, STATE, 0, 0
-            defvar HERE, HERE, 0, 0
-            defvar LATEST, LATEST, 0, wel ; SYSCALL0 must be last in built-in dictionary
-            defvar S0, S0, 0, 0
-            defvar BASE, BASE, 0, 10
 
 ;  Virtual Machine constants
 ; const: VERSION     Is the current version of this FORTH.
+defconst VERSION, VERSION, 0, 1
 
 ; const: R0          The address of the top of the return stack.
+defconst R0, R0, 0, 2
 
 ; const: DOCOL       Pointer to DOCOL.
+defconst DOCOL, __DOCOL, 0, DOCOL
 
 ; const: F_IMMED     The IMMEDIATE flag's actual value.
+defconst F_IMMED, __F_IMMED, 0, 0x80
 
 ; const: F_HIDDEN    The HIDDEN flag's actual value.
+defconst F_HIDDEN, __F_HIDDEN, 0, 0x20
 
 ; const: F_LENMASK   The length mask in the flags/len byte.
-
-            defconst VERSION, VERSION, 0, 1
-            defconst R0, R0, 0, 2
-            defconst DOCOL, __DOCOL, 0, DOCOL
-            defconst F_IMMED, __F_IMMED, 0, 0x80
-            defconst F_HIDDEN, __F_HIDDEN, 0, 0x20
-            defconst F_LENMASK, __F_LENMASK, 0, 0x1f
+defconst F_LENMASK, __F_LENMASK, 0, 0x1f
 
 
 section .text
@@ -105,6 +98,7 @@ align 4
 ;   This is the core of the forth virtual machine. This routine executes the
 ;   non-native words. A non-native word is formed by a serie of pointers to the 
 ;   codewords of other forth words. DOCOL executes each one of these codewords.
+global DOCOL
 DOCOL:
             PUSHRSP esi         ; Saves the return point
             add eax, 4          ; eax pointed to the codeword of this word,
@@ -118,5 +112,3 @@ defcode EXIT, EXIT, 0
             POPRSP esi          ; Pops the address of the word to return to
             NEXT                ; and executes it
 
-
-;%include "forth_words.s"

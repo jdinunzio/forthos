@@ -1,5 +1,6 @@
-KERNEL_OBJS = boot.o gdt.o idt.o kernel.o
-TEST_OBJS = test.o
+KERNEL_OBJS = boot.o gdt.o idt.o 
+FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel.o 
+FORTH_INC = forth_core.h forth_words.h kernel_words.h kernel_video.h 
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32
 asm = nasm
@@ -8,17 +9,18 @@ naturaldocs = /usr/bin/naturaldocs
 .PHONY: docs
 
 .s.h:
-	grep '^def' $< | cut -d ',' -f 2 | sed -e 's/^/extern/' > $@
+	grep '^defvar' $< | cut -d ',' -f 2 | sed -e 's/ */var_/' > $@.tmp
+	grep '^def' $< | cut -d ',' -f 2 | sed -e 's/ *//' >> $@.tmp
+	grep '^def' $< | cut -d ' ' -f 2 | cut -d ',' -f 1  >> $@.tmp
+	sort -u $@.tmp | awk  '/^[A-Za-z_][A-Za-Z_0-9]*$$/ {print "extern " $$0}' > $@ 
+	rm $@.tmp
 
 .s.o:
 	$(asm) $(ASFLAGS) $<
 
 
-kernel: $(KERNEL_OBJS) 
-	ld $(LDFLAGS) -o kernel $(KERNEL_OBJS)
-
-test: $(TEST_OBJS)
-	ld  $(LDFLAGS) -o test $(TEST_OBJS)
+kernel: $(FORTH_INC) $(KERNEL_OBJS) $(FORTH_OBJS)
+	ld $(LDFLAGS) -o kernel $(KERNEL_OBJS) $(FORTH_OBJS)
 
 image: kernel
 	cp -f floppy.orig.img floppy.img
@@ -27,8 +29,6 @@ image: kernel
 	sudo cp kernel /mnt/kernel
 	-sudo umount /dev/loop0
 	-sudo losetup -d /dev/loop0 
-
-#kernel.o: forth_words.s forth_core.s
 
 run: image
 	qemu  -fda floppy.img  
