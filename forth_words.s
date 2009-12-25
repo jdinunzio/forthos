@@ -67,26 +67,26 @@ defcode OVER, OVER, 0
 
 ; function: ROT
 ; Stack:
-;   a b c -- c a b
+;   a b c -- b c a
 defcode ROT, ROT, 0
             pop eax
             pop ebx
             pop ecx
+            push ebx
             push eax
             push ecx
-            push ebx
             NEXT
 
-; function: -ROT (NROT)
+;; function: -ROT (NROT)
 ; Stack:
-;   a b c -- b c a
+;   a b c -- c a b
 defcode -ROT, NROT, 0
             pop eax
             pop ebx
             pop ecx
-            push ebx
             push eax
             push ecx
+            push ebx
             NEXT
 
 ; function: 2DROP (TWODROP)

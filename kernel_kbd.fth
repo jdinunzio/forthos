@@ -21,43 +21,39 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- kbd_status
-defword KBD_FLAGS, KBD_FLAGS, 0
-        LITN 0x64
-        dd INB
-        dd EXIT
+: KBD_FLAGS KBD_FLAGS 0
+    0x64 INB
+;
 
 ; function: KBD_BUFFER_FULL
 ;   true if there is a scancode waiting to be readed
 ;
 ; Stack:
 ;   -- bool
-defword KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
-        dd KBD_FLAGS
-        LITN 1
-        dd AND
-        dd EXIT
+: KBD_BUFFER_FULL KBD_BUFFER_FULL 0
+    KBD_FLAGS 1 AND
+;
 
 ; function: KBD_SCANCODE_NOW
 ;   Returns the scancode readed on the keyboard at this moment.
 ;
 ; Stack:
 ;   -- scancode
-defword KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
-        LITN 0x60
-        dd INB
-        dd EXIT
+: KBD_SCANCODE_NOW KBD_SCANCODE_NOW 0
+    0x60 INB
+;
 
 ; function: KBD_SCANCODE
 ; Waits for a key pressed and returns its sacancode.
 ;
 ; Stack:
 ; -- scancode
-defword KBD_SCANCODE, KBD_SCANCODE, 0
-        begin
-        dd KBD_BUFFER_FULL
-        until
-        dd KBD_SCANCODE_NOW
-        dd EXIT
+: KBD_SCANCODE KBD_SCANCODE 0
+    begin
+        KBD_BUFFER_FULL
+    until
+    KBD_SCANCODE_NOW
+;
 
 
 ; function _TX_KEY_STATUS
@@ -68,69 +64,43 @@ defword KBD_SCANCODE, KBD_SCANCODE, 0
 ;
 ; stack:
 ;   scancode test flag --
-defword _TX_KEY_STATUS, _TX_KEY_STATUS, 0
-        dd NROT
-        dd EQU
-        if
-        dd KEY_STATUS
-        dd FETCH
-        dd XOR
-        dd KEY_STATUS
-        dd STORE
-        else
-        dd DROP
-        then
-        dd EXIT
+: _TX_KEY_STATUS _TX_KEY_STATUS 0
+    -ROT =
+    if
+        KEY_STATUS @ XOR  KEY_STATUS !
+    else
+        DROP
+    then
+;
 
 ; function: _UPDATE_KBD_FLAGS
 ;   Updates the KBD_FLAGS variable according with the scancode given.
 ;
 ; Stack:
 ;   scancode --
-defword _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
-        LITN 0xFF
-        dd AND
+: _UPDATE_KBD_FLAGS _UPDATE_KBD_FLAGS 0
+    0xFF AND
 
-        ;  TODO - break when test ok
-        dd DUP
-        LITN 186
-        LITN _KEY_STAT_CAPS
-        dd _TX_KEY_STATUS
-        ;  CAPS   down
-        dd DUP
-        LITN 42
-        LITN _KEY_STAT_SHIFT
-        dd _TX_KEY_STATUS
-        ;  LSHIFT down
-        dd DUP
-        LITN 170
-        LITN _KEY_STAT_SHIFT
-        dd _TX_KEY_STATUS
-        ;  LSHIFT up
-        dd DUP
-        LITN 54
-        LITN _KEY_STAT_SHIFT
-        dd _TX_KEY_STATUS
-        ;  RSHIFT down
-        dd DUP
-        LITN 182
-        LITN _KEY_STAT_SHIFT
-        dd _TX_KEY_STATUS
-        ;  RSHIFT up
+    # TODO - break when test ok
+    DUP 186 _KEY_STAT_CAPS  _TX_KEY_STATUS      # CAPS   down
+    DUP 42  _KEY_STAT_SHIFT _TX_KEY_STATUS      # LSHIFT down
+    DUP 170 _KEY_STAT_SHIFT _TX_KEY_STATUS      # LSHIFT up
+    DUP 54  _KEY_STAT_SHIFT _TX_KEY_STATUS      # RSHIFT down
+    DUP 182 _KEY_STAT_SHIFT _TX_KEY_STATUS      # RSHIFT up
 
-        dd DROP
-        dd EXIT
+    DROP
+;
 
 ; function: GETCHAR
 ;   Waits for a key to be pressed and then returns its ASCII code.
 ;
 ; Stack:
 ;   -- c
-defword GETCHAR, GETCHAR, 0
-        dd KBD_SCANCODE
-        dd _UPDATE_KBD_FLAGS
-        ; 2 SHL           ;  TODO - fetch in table
-        dd EXIT
+: GETCHAR GETCHAR 0
+    KBD_SCANCODE  _UPDATE_KBD_FLAGS
+    #2 SHL   #KEY_STATUS @  +
+    # TODO - fetch in table
+;
 
 
 ;THIS IS CODE FORM retro8 by crc
