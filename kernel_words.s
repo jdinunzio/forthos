@@ -8,14 +8,14 @@
 
 [BITS 32]
 ; function: OUTB
-; Executes an out assembly instruction
+;   Executes an out assembly instruction
 ;
 ; Stack:
-; val port --
+;   val port --
 ;
 ; Parameters:
-; val - The value to out. Byte.
-; port - The port to output the value. int16.
+;   val - The value to out. Byte.
+;   port - The port to output the value. int16.
 defcode OUTB, OUTB, 0
         pop edx
         pop eax
@@ -23,10 +23,10 @@ defcode OUTB, OUTB, 0
         NEXT
 
 ; function: INB
-; Executes an IN assembly instruction
+;   Executes an IN assembly instruction
 ;
 ; Stack:
-; port -- val
+;   port -- val
 defcode INB, INB, 0
         pop edx
         xor eax, eax

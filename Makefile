@@ -22,7 +22,6 @@ naturaldocs = /usr/bin/naturaldocs
 .s.o:
 	$(asm) $(ASFLAGS) $<
 
-
 kernel: $(FORTH_INC) $(KERNEL_OBJS) $(FORTH_OBJS)
 	ld $(LDFLAGS) -o kernel $(KERNEL_OBJS) $(FORTH_OBJS)
 

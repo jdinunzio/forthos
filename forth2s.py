@@ -77,18 +77,24 @@ def translate_lines(fin, fout):
     '''
     for line in fin:
         if line.startswith(';'):
-            fout.write('    dd EXIT\n')
+            fout.write('        dd EXIT\n')
             return
 
-        parts = line.split()
+        code, comment = (line.split('#') + [None])[:2]
 
-        if parts[0] == '#':
-            fout.write('    ; %s\n' % ' '.join(parts[1:]))
+        parts = code.split()
+        if not parts and not comment:
+            fout.write('\n')
             continue
-
+            
         words = [translate_word(word) for word in parts]
         for word in words:
-            fout.write('    %s\n' % word)
+            fout.write('        %s\n' % word)
+
+        if comment:
+            fout.write('        ; %s' % comment)
+            continue
+
 
 
 def translate_word(word):
@@ -113,6 +119,8 @@ def tr_lit_n(word):
     function: tr_lit_n
     Translate a literal integer.
     '''
+    if word.startswith('0x') or word.startswith('0X'):
+        return 'LITN %s' % word
     try:
         int(word)
         return 'LITN %s' % word
@@ -125,6 +133,16 @@ def tr_lit_s(word):
     Translate a literal character.
     '''
     if word.startswith("'"):
+        return 'LITN %s' % word
+    else:
+        return ''
+
+def tr_lit_lit(word):
+    '''
+    function: tr_lit_lit
+    Translate a literal defined by a %define macro.
+    '''
+    if word in LITERALS:
         return 'LITN %s' % word
     else:
         return ''
@@ -166,17 +184,30 @@ def get_symbols():
     dct = {}
     for line in commands.getoutput("grep '^def[vc]' *.s").splitlines():
         parts = line.split()
-        key = parts[1].replace(',', '')
-        val = parts[2].replace(',', '')
+        parts = ''.join(parts[1:]).split(',')
+        key = parts[0]
+        val = parts[1]
         dct[key] = val
     return dct
 
+def get_literals():
+    '''
+    function: get_literals
+    Return a list with the names of the %defines found in assembly labels.
+    
+    It is used to translate literals.
+    '''
+    defs = commands.getoutput("grep '^%define ' *.s").splitlines()
+    lits = [x.split()[1] for x in defs]
+    return lits
+
 # Use this version for compile recursive definitions
-TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_macro, tr_symbol, tr_id]
+TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_lit_lit, tr_macro, tr_symbol, tr_id]
 # Use this version to detect bogus words
-# TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_macro, tr_symbol]
+# TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_lit_lit, tr_macro, tr_symbol]
 MACROS = commands.getoutput("grep -r '%macro' *s | awk '{print $2}'").split()
 SYMBOLS = get_symbols()
+LITERALS = get_literals()
 
 def main():
     '''

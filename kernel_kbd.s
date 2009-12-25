@@ -9,24 +9,41 @@
 %include "kernel_video.h"
 
 [BITS 32]
-; function: KBD_SCANCODE_NOW
-; Returns the scancode readed on the keyboard at this moment.
+%define _KEY_STAT_CAPS 0x01
+%define _KEY_STAT_SHIFT 0x02
+
+; variable: KEY_STATUS
+;   Store the status of CAPS, SHIFT and CONTROL keys.
+defvar KEY_STATUS, KEY_STATUS, 0, 0
+
+; function: KDB_FLAGS
+;   Returns the keyboard status code.
 ;
 ; Stack:
-; -- scancode
-defword KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
-        LITN 0x60
+;   -- kbd_status
+defword KDB_FLAGS, KDB_FLAGS, 0
+        LITN 0x64
         dd INB
         dd EXIT
 
-; function: KBD_IS_KEY_PRESSED
-; Returns 1 if a key is presed in this moment.
+; function: KBD_BUFFER_FULL
+;   true if there is a scancode waiting to be readed
 ;
 ; Stack:
-; -- 0 (There's data waiting for being read)
-; -- n (Ohter case)
-defword KBD_IS_KEY_PRESSED, KBD_IS_KEY_PRESSED, 0
-        LITN 0x64
+;   -- bool
+defword KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
+        dd KDB_FLAGS
+        LITN 1
+        dd AND
+        dd EXIT
+
+; function: KBD_SCANCODE_NOW
+;   Returns the scancode readed on the keyboard at this moment.
+;
+; Stack:
+;   -- scancode
+defword KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
+        LITN 0x60
         dd INB
         dd EXIT
 
@@ -37,12 +54,84 @@ defword KBD_IS_KEY_PRESSED, KBD_IS_KEY_PRESSED, 0
 ; -- scancode
 defword KBD_SCANCODE, KBD_SCANCODE, 0
         begin
-            dd KBD_IS_KEY_PRESSED
-            LITN 1
-            dd EQU
+        dd KBD_BUFFER_FULL
         until
         dd KBD_SCANCODE_NOW
         dd EXIT
+
+
+; function _TX_KEY_STATUS
+;   Test and XORG the KEY_STATUS variable.
+;
+;   If the scancode is equal to the given test, then it makes an XOR
+;   between KEY_STATUS and flags.
+;
+; stack:
+;   scancode test flag --
+defword _TX_KEY_STATUS, _TX_KEY_STATUS, 0
+        dd NROT
+        dd EQU
+        if
+        dd KEY_STATUS
+        dd FETCH
+        dd XOR
+        dd KEY_STATUS
+        dd STORE
+        else
+        dd DROP
+        then
+        dd EXIT
+
+; function: _UPDATE_KBD_FLAGS
+;   Updates the KBD_FLAGS variable according with the scancode given.
+;
+; Stack:
+;   scancode --
+defword _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
+        LITN 0xFF
+        dd AND
+
+        ;  TODO - break when test ok
+        dd DUP
+        LITN 186
+        LITN _KEY_STAT_CAPS
+        dd _TX_KEY_STATUS
+        ;  CAPS   down
+        dd DUP
+        LITN 42
+        LITN _KEY_STAT_SHIFT
+        dd _TX_KEY_STATUS
+        ;  LSHIFT down
+        dd DUP
+        LITN 170
+        LITN _KEY_STAT_SHIFT
+        dd _TX_KEY_STATUS
+        ;  LSHIFT up
+        dd DUP
+        LITN 54
+        LITN _KEY_STAT_SHIFT
+        dd _TX_KEY_STATUS
+        ;  RSHIFT down
+        dd DUP
+        LITN 182
+        LITN _KEY_STAT_SHIFT
+        dd _TX_KEY_STATUS
+        ;  RSHIFT up
+
+        dd DROP
+        dd EXIT
+
+; function: GETCHAR
+;   Waits for a key to be pressed and then returns its ASCII code.
+;
+; Stack:
+;   -- c
+defword GETCHAR, GETCHAR, 0
+        dd KBD_SCANCODE
+        dd _UPDATE_KBD_FLAGS
+        ; 2 SHL           ;  TODO - fetch in table
+        dd EXIT
+
 
 ;THIS IS CODE FORM retro8 by crc
 ;			
@@ -137,16 +226,16 @@ defword KBD_SCANCODE, KBD_SCANCODE, 0
 ;	jmp .1			  ;  And try again
 ;.shifts dd shift,alpha
 ;board dd alpha
-;alpha:
-;  db 0,27,"1234567890-=",8	        ;00-0E
-;;  db 9,"qwertyuiop[]",10	        ;0F-1C
-;  db 0,"asdfghjkl;'`"		        ;1D-29
-;  db -1,"\zxcvbnm,./",-1,"+",0,32,-2    ;2A-3A
-;shift:
-;  db 0,27,"!@#$%^&*()_+",8	        ;00-0E
-;  db 9,"QWERTYUIOP{}",10	        ;0F-1C
-;  db 0,'ASDFGHJKL:"~'		        ;1D-29
-;  db -1,"|ZXCVBNM<>?",-1,"=",0,32,-2    ;2A-3A
+alpha:
+  db  0, 27,"1234567890-=", 8	        ;00-0E
+  db  9, "qwertyuiop[]", 10	        ;0F-1C
+  db  0, "asdfghjkl;'`"		        ;1D-29
+  db -1, "\zxcvbnm,./", -1,"+",0,32,-2    ;2A-3A
+shift:
+  db  0,27,"!@#$%^&*()_+",8	        ;00-0E
+  db  9,"QWERTYUIOP{}",10	        ;0F-1C
+  db  0,'ASDFGHJKL:"~'		        ;1D-29
+  db -1,"|ZXCVBNM<>?",-1,"=",0,32,-2    ;2A-3A
 
 
 

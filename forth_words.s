@@ -392,7 +392,6 @@ defcode INVERT, INVERT, 0
             not dword [esp]
             NEXT
 
-; Memory
 ; function: ! (STORE)
 ;   Stores a value in an address.
 ;
@@ -555,6 +554,7 @@ defcode RDROP, RDROP, 0
             NEXT
 
 ; Branching
+
 ; function: BRANCH
 ;   Unconditional relative branch.
 ;
@@ -585,6 +585,7 @@ defcode 0BRANCH, ZBRANCH, 0
             NEXT
 
 ; Data stack manipulation
+
 ; function: DSP@ (DSPFETCH)
 ;
 ; Stack:
