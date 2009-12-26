@@ -16,7 +16,7 @@
 ;
 ; stack:
 ;   n --
-: intprint intprint 0
+: intprint, intprint, 0
     10 /MOD
     DUP 0<> if  intprint  else  DROP  then
     '0' + EMIT
@@ -25,7 +25,7 @@
 ; function: MAIN
 ; The first forth word invoked by the kernel.
 %define s_hello hello
-: MAIN MAIN 0
+: MAIN, MAIN, 0
      CLEAR
     'a' EMIT 'b' EMIT CR 
     'c' EMIT

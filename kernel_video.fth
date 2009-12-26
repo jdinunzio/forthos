@@ -45,7 +45,7 @@ defword CURSOR_POS_REL, CURSOR_POS_REL, 0
 ;
 ; Stack
 ;   -- cursor_pos
-: CURSOR_POS CURSOR_POS 0
+: CURSOR_POS, CURSOR_POS, 0
     CURSOR_POS_REL SCREEN +
 ;
 
@@ -54,7 +54,7 @@ defword CURSOR_POS_REL, CURSOR_POS_REL, 0
 ;
 ; Stack:
 ;   --
-: AT_HW AT_HW 0
+: AT_HW, AT_HW, 0
     CURSOR_POS_REL          # Get the position of the cursor
     14 0x3D4 OUTB           # Say you're going to send the high byte
     DUP   1 N_BYTE          # ... get the higer byte
@@ -70,7 +70,7 @@ defword CURSOR_POS_REL, CURSOR_POS_REL, 0
 ; 
 ; Stack:
 ;   y x --
-: atx atx 0
+: atx, atx, 0
     CURSOR_POS_X !
     CURSOR_POS_Y !
 ;
@@ -110,7 +110,7 @@ defcode BG, BG, 0
 ;
 ; Stack:
 ;   color -- color
-: BRIGHT BRIGHT 0
+: BRIGHT, BRIGHT, 0
     8 +
 ;
 
@@ -118,7 +118,7 @@ defcode BG, BG, 0
 ;
 ; Stack
 ;   --
-: SCREEN_SCROLL SCREEN_SCROLL 0
+: SCREEN_SCROLL, SCREEN_SCROLL, 0
     SCREEN DUP 160 + SWAP 1920 CMOVE
     # TODO - Clean last line, move cursor
 ;
@@ -128,7 +128,7 @@ defcode BG, BG, 0
 ;
 ; Stack:
 ;   --
-: SCREEN_SCROLL_ SCREEN_SCROLL_ 0
+: SCREEN_SCROLL_, SCREEN_SCROLL_, 0
     CURSOR_POS_Y @ 25 > if
         SCREEN_SCROLL
         25 CURSOR_POS_Y !
@@ -140,7 +140,7 @@ defcode BG, BG, 0
 ;
 ; Stack:
 ;   --
-: CURSOR_FORWARD CURSOR_FORWARD 0
+: CURSOR_FORWARD, CURSOR_FORWARD, 0
     1 CURSOR_POS_X @ + 80 /MOD
     CURSOR_POS_Y +!
     CURSOR_POS_X !
@@ -169,7 +169,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;   charword --
-: EMITCW EMITCW 0
+: EMITCW, EMITCW, 0
     CURSOR_POS W!
     CURSOR_FORWARD
 ;
@@ -179,7 +179,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;   char --
-: EMIT EMIT 0
+: EMIT, EMIT, 0
     C>CW EMITCW
 ;
 
@@ -188,7 +188,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;   &string --
-: PRINTCSTRING PRINTCSTRING 0
+: PRINTCSTRING, PRINTCSTRING, 0
     begin DUP C@ DUP while EMIT 1+ repeat
     2DROP
 ;
@@ -198,7 +198,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;   char --
-: CLEAR CLEAR 0
+: CLEAR, CLEAR, 0
     0 0 atx
     2000 0 do SPC EMIT loop
     0 0 atx
@@ -209,7 +209,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;    --
-: CR CR 0
+: CR, CR, 0
     1 CURSOR_POS_Y +!
     0 CURSOR_POS_X !
     AT_HW
@@ -220,7 +220,8 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;
 ; Stack:
 ;   --
-: TAB TAB 0
+: TAB, TAB, 0
+    # TODO - Move to the next column multiple of 8
     8 CURSOR_POS_X +! AT_HW
 ;
 

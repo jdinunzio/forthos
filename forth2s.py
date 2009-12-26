@@ -44,7 +44,7 @@ def translate_forth_def(line):
     The forth definition must start at the begining of line, and must have the
     following structure:
 
-        : name label flags
+        : name, label, flags
 
     Where:
         name - The name of the forth word, as seen for other forth words.
@@ -58,8 +58,7 @@ def translate_forth_def(line):
     Returns:
         string - A line of text with the defword of the forth word being defined.
     '''
-    parts = tuple(line.split()[1:])
-    defword = 'defword %s, %s, %s' % parts
+    defword = 'defword ' + line[1:-1]
     return defword
 
 def translate_lines(fin, fout):
@@ -177,12 +176,12 @@ def tr_id(word):
 def get_symbols():
     '''
     function: get_symbols
-    Returns a dict wich associate forth words with assembly labels.
+      Returns a dict wich associate forth words with its assembly labels.
 
     It is used to translate forth words with symbols in it.
     '''
     dct = {}
-    for line in commands.getoutput("grep '^def[vc]' *.s").splitlines():
+    for line in commands.getoutput("grep '^def[vc]' *.s *.fth").splitlines():
         parts = line.split()
         parts = ''.join(parts[1:]).split(',')
         key = parts[0]

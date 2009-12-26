@@ -21,7 +21,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- kbd_status
-defword KBD_FLAGS, KBD_FLAGS, 0
+defword  KBD_FLAGS, KBD_FLAGS, 0
         LITN 0x64
         dd INB
         dd EXIT
@@ -31,7 +31,7 @@ defword KBD_FLAGS, KBD_FLAGS, 0
 ;
 ; Stack:
 ;   -- bool
-defword KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
+defword  KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
         dd KBD_FLAGS
         LITN 1
         dd AND
@@ -42,7 +42,7 @@ defword KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
 ;
 ; Stack:
 ;   -- scancode
-defword KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
+defword  KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
         LITN 0x60
         dd INB
         dd EXIT
@@ -52,7 +52,7 @@ defword KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
 ;
 ; Stack:
 ; -- scancode
-defword KBD_SCANCODE, KBD_SCANCODE, 0
+defword  KBD_SCANCODE, KBD_SCANCODE, 0
         begin
         dd KBD_BUFFER_FULL
         until
@@ -68,7 +68,7 @@ defword KBD_SCANCODE, KBD_SCANCODE, 0
 ;
 ; stack:
 ;   scancode test flag --
-defword _TX_KEY_STATUS, _TX_KEY_STATUS, 0
+defword  _TX_KEY_STATUS, _TX_KEY_STATUS, 0
         dd NROT
         dd EQU
         if
@@ -87,7 +87,7 @@ defword _TX_KEY_STATUS, _TX_KEY_STATUS, 0
 ;
 ; Stack:
 ;   scancode --
-defword _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
+defword  _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
         LITN 0xFF
         dd AND
 
@@ -126,7 +126,7 @@ defword _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
 ;
 ; Stack:
 ;   -- c
-defword GETCHAR, GETCHAR, 0
+defword  GETCHAR, GETCHAR, 0
         dd KBD_SCANCODE
         dd _UPDATE_KBD_FLAGS
         ; 2 SHL           ;  TODO - fetch in table

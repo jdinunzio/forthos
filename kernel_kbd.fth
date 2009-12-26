@@ -21,7 +21,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- kbd_status
-: KBD_FLAGS KBD_FLAGS 0
+: KBD_FLAGS, KBD_FLAGS, 0
     0x64 INB
 ;
 
@@ -30,7 +30,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- bool
-: KBD_BUFFER_FULL KBD_BUFFER_FULL 0
+: KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
     KBD_FLAGS 1 AND
 ;
 
@@ -39,7 +39,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- scancode
-: KBD_SCANCODE_NOW KBD_SCANCODE_NOW 0
+: KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
     0x60 INB
 ;
 
@@ -48,7 +48,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ; -- scancode
-: KBD_SCANCODE KBD_SCANCODE 0
+: KBD_SCANCODE, KBD_SCANCODE, 0
     begin
         KBD_BUFFER_FULL
     until
@@ -64,7 +64,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; stack:
 ;   scancode test flag --
-: _TX_KEY_STATUS _TX_KEY_STATUS 0
+: _TX_KEY_STATUS, _TX_KEY_STATUS, 0
     -ROT =
     if
         KEY_STATUS @ XOR  KEY_STATUS !
@@ -78,7 +78,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   scancode --
-: _UPDATE_KBD_FLAGS _UPDATE_KBD_FLAGS 0
+: _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
     0xFF AND
 
     # TODO - break when test ok
@@ -96,7 +96,7 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; Stack:
 ;   -- c
-: GETCHAR GETCHAR 0
+: GETCHAR, GETCHAR, 0
     KBD_SCANCODE  _UPDATE_KBD_FLAGS
     #2 SHL   #KEY_STATUS @  +
     # TODO - fetch in table
