@@ -24,26 +24,34 @@
 
 ; function: MAIN
 ; The first forth word invoked by the kernel.
+%define s_hello hello
 : MAIN MAIN 0
-    CLEAR
+     CLEAR
+    'a' EMIT 'b' EMIT CR 
+    'c' EMIT
+    5 30 atx 'd' EMIT 
+    6 32 atx 'e' EMIT CR
+    s_hello PRINTCSTRING
+    # SCREEN_SCROLL
     begin
-        5 10 atx
+        # 5 10 atx
+        # 'a' EMIT
         
         # print the KBD_FLAGS
-        KBD_FLAGS intprint   SPC EMIT
+        # KBD_FLAGS intprint   SPC EMIT
         
         # print the scan code
-        KBD_SCANCODE 0xFF AND
-        DUP 
-        intprint
-        SPC EMIT
+        # KBD_SCANCODE 0xFF AND
+        # DUP 
+        # intprint
+        # SPC EMIT
 
         # print the key flags
-        _UPDATE_KBD_FLAGS
-        KEY_STATUS @ intprint
+        # _UPDATE_KBD_FLAGS
+        # KEY_STATUS @ intprint
 
         # clean the next characters
-        SPC EMIT  SPC EMIT  SPC EMIT
+        # SPC EMIT  SPC EMIT  SPC EMIT
     0 until
 ;
 

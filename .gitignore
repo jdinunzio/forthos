@@ -1,7 +1,5 @@
+.*
 *.o
 floppy.img
 kernel
-test
 docs/*
-z-jonesforth/
-z-origos/

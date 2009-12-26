@@ -500,7 +500,12 @@ defcode C@C!, CCOPY, 0
 ;   Block copy.
 ;
 ; Stack:
-; --
+;   &s &d n --
+; 
+; Params:
+;   &s - Source Address
+;   &d - Destination Address
+;   n  - Number of bytes to copy
 defcode CMOVE, CMOVE, 0
             mov edx, esi      
             pop ecx       
