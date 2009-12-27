@@ -8,6 +8,9 @@
 %include "kernel_words.h"
 %include "kernel_video.h"
 
+extern keymap
+%define KEYMAP keymap
+
 [BITS 32]
 %define _KEY_STAT_CAPS 0x01
 %define _KEY_STAT_SHIFT 0x02
@@ -57,13 +60,15 @@ defword  KBD_SCANCODE, KBD_SCANCODE, 0
         dd KBD_BUFFER_FULL
         until
         dd KBD_SCANCODE_NOW
+        LITN 0xFF
+        dd AND
         dd EXIT
 
 
 ; function _TX_KEY_STATUS
-;   Test and XORG the KEY_STATUS variable.
+;   Test and XOR the KEY_STATUS variable.
 ;
-;   If the scancode is equal to the given test, then it makes an XOR
+;   If the scancode is equal to the given test, makes an XOR
 ;   between KEY_STATUS and flags.
 ;
 ; stack:
@@ -82,18 +87,15 @@ defword  _TX_KEY_STATUS, _TX_KEY_STATUS, 0
         then
         dd EXIT
 
-; function: _UPDATE_KBD_FLAGS
+; function: _UPDATE_KEY_STATUS
 ;   Updates the KBD_FLAGS variable according with the scancode given.
 ;
 ; Stack:
 ;   scancode --
-defword  _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
-        LITN 0xFF
-        dd AND
-
-        ;  TODO - break when test ok
+defword  _UPDATE_KEY_STATUS, _UPDATE_KEY_STATUS, 0
+        ;  TODO - XOR could fail in some cases. Set o clear the bit.
         dd DUP
-        LITN 186
+        LITN 58
         LITN _KEY_STAT_CAPS
         dd _TX_KEY_STATUS
         ;  CAPS   down
@@ -121,15 +123,54 @@ defword  _UPDATE_KBD_FLAGS, _UPDATE_KBD_FLAGS, 0
         dd DROP
         dd EXIT
 
+; stack:
+;   scancode -- bool
+defword  _KEY_DOWN?, _KEY_DOWN, 0
+        LITN 0x80
+        dd AND
+        dd ZEQU
+        dd EXIT
+
+; function: SC>C (SCANCODE2CHAR)
+;   Converts a scancode to an ASCII character.
+; 
+;   If the scancode correspond to keyup or to a non-character
+;   it returns 0
+;
+; stack:
+;   scancode -- char
+defword  SC>C, SCANCODE2CHAR, 0
+        dd DUP
+        dd _KEY_DOWN
+        if
+        LITN 4
+        dd MUL
+        dd KEY_STATUS
+        dd FETCH
+        dd ADD
+        LITN KEYMAP
+        dd ADD
+        dd FETCHBYTE
+        else
+        LITN 0
+        then
+        dd EXIT
+
 ; function: GETCHAR
 ;   Waits for a key to be pressed and then returns its ASCII code.
 ;
 ; Stack:
 ;   -- c
 defword  GETCHAR, GETCHAR, 0
+        LITN 0
+        begin
+        dd DROP
         dd KBD_SCANCODE
-        dd _UPDATE_KBD_FLAGS
-        ; 2 SHL           ;  TODO - fetch in table
+        dd DUP
+        dd _UPDATE_KEY_STATUS
+        dd SCANCODE2CHAR
+        dd DUP
+        until
         dd EXIT
 
 

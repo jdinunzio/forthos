@@ -1,5 +1,5 @@
 KERNEL_OBJS = boot.o gdt.o idt.o 
-FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel_kbd.o kernel_test.o kernel.o 
+FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel_kbd.o kernel_test.o kbd_map.o kernel.o 
 FORTH_INC = forth_core.h forth_words.h kernel_words.h kernel_video.h 
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32

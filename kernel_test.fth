@@ -22,36 +22,42 @@
     '0' + EMIT
 ;
 
+: print_scancodes, print_scan_codes, 0
+    begin KBD_SCANCODE intprint SPC EMIT 0 until
+;
+
 ; function: MAIN
 ; The first forth word invoked by the kernel.
 %define s_hello hello
 : MAIN, MAIN, 0
-     CLEAR
-    'a' EMIT 'b' EMIT CR 
-    'c' EMIT
-    5 30 atx 'd' EMIT 
-    6 32 atx 'e' EMIT CR
-    s_hello PRINTCSTRING
-    # SCREEN_SCROLL
+    CLEAR
+     print_scancodes
+    CR s_hello PRINTCSTRING
     begin
-        # 5 10 atx
-        # 'a' EMIT
-        
-        # print the KBD_FLAGS
-        # KBD_FLAGS intprint   SPC EMIT
-        
-        # print the scan code
-        # KBD_SCANCODE 0xFF AND
-        # DUP 
-        # intprint
-        # SPC EMIT
+        5 10 atx
+        # Print key_status 
+        #KBD_SCANCODE 
+        #   DUP _UPDATE_KEY_STATUS 
+        #   KEY_STATUS @ intprint SPC EMIT
 
-        # print the key flags
-        # _UPDATE_KBD_FLAGS
-        # KEY_STATUS @ intprint
+        # Print scancode
+        #DUP intprint SPC EMIT
 
-        # clean the next characters
-        # SPC EMIT  SPC EMIT  SPC EMIT
+        # Print if key is down
+        #DUP _KEY_DOWN? if '1' EMIT else '0' EMIT then
+        #SPC EMIT
+        
+        # Our own implementation of GETCHAR
+        #DUP SC>C intprint
+        #SPC EMIT
+
+        # print the key char
+         GETCHAR EMIT 
+
+
+
+        # Limpiar siguientes caracteres
+        SPC EMIT SPC EMIT SPC EMIT
     0 until
 ;
 
