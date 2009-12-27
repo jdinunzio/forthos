@@ -1,6 +1,13 @@
 KERNEL_OBJS = boot.o gdt.o idt.o 
 FORTH_OBJS = forth_core.o forth_words.o kernel_words.o kernel_video.o kernel_kbd.o kernel_test.o kbd_map.o kernel.o 
 FORTH_INC = forth_core.h forth_words.h kernel_words.h kernel_video.h 
+
+# Clean files
+# Headers to clean
+DEL_H_OBJS = forth_core.h forth_words.h kernel.h
+# Objects which .h and .s files should be clean
+DEL_H_S_OBJS = kernel_kbd.fth  kernel_test.fth  kernel_video.fth  kernel_words.fth
+
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32
 asm = nasm
@@ -11,13 +18,10 @@ naturaldocs = /usr/bin/naturaldocs
 
 .fth.s:
 	./forth2s.py -i $< -o $@
+	./s2h $@
 
 .s.h:
-	grep '^defvar' $< | cut -d ',' -f 2 | sed -e 's/ */var_/' > $@.tmp
-	grep '^def' $< | cut -d ',' -f 2 | sed -e 's/ *//' >> $@.tmp
-	grep '^def' $< | cut -d ' ' -f 2 | cut -d ',' -f 1  >> $@.tmp
-	sort -u $@.tmp | awk  '/^[A-Za-z_][A-Za-Z_0-9]*$$/ {print "extern " $$0}' > $@ 
-	rm $@.tmp
+	./s2h $<
 
 .s.o:
 	$(asm) $(ASFLAGS) $<
@@ -36,6 +40,13 @@ image: kernel
 run: image
 	qemu  -fda floppy.img  
 
+
+forth_words.o: forth_core.h
+kernel_words.o: forth_words.h forth_core.h
+kernel_video.o: kernel_words.h forth_words.h forth_core.h
+kernel_kbd.o: kernel_video.h kernel_video.s kernel_words.h forth_words.h forth_core.h
+kernel_test.o: kernel_kbd.h kernel_video.h kernel_words.h forth_words.h forth_core.h
+
 # Generating documentation.
 # Be sure to add "s" to "Extensions:" in "Language: Assembly"
 # in /usr/share/perl5/naturaldocs/Config/Languages.txt
@@ -43,7 +54,8 @@ docs:
 	$(naturaldocs) -i . -p docs -o HTML docs 
 
 clean:
-	rm -f *.o core kernel test
-
-
+	-rm -f $(DEL_H_OBJS)
+	-rm -f $(DEL_H_S_OBJS:.fth=.h)
+	-rm -f $(DEL_H_S_OBJS:.fth=.s)
+	-rm -f *.o core kernel test
 

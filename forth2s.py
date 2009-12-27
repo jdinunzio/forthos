@@ -198,7 +198,7 @@ def get_literals():
     
     It is used to translate literals.
     '''
-    defs = commands.getoutput("grep '^%define ' *.s").splitlines()
+    defs = commands.getoutput("grep '^%define ' *.s *.fth").splitlines()
     lits = [x.split()[1] for x in defs]
     return lits
 
