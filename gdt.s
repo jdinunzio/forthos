@@ -8,7 +8,7 @@
 
 [BITS 32]
 ; macro: gdt_entry
-; Create a gtd_entry structure
+;   Create a gtd_entry structure
 %macro gdt_entry 4
             section .rodata
             ; dh base, dh limit, db access, db gran
@@ -21,27 +21,27 @@
 %endmacro
 
 ; type: gdtable
-; GDT
+;   GDT
 gdtable:
             gdt_entry 0, 0, 0, 0
             gdt_entry 0, 0xFFFFFFFF, 0x9A, 0xCF
             gdt_entry 0, 0xFFFFFFFF, 0x92, 0xCF
 
 ; type: gdt_pointer
-; Pointer to the gdt
+;   Pointer to the gdt
 gdt_pointer:
             dw 8*3 -1           ; Limit
             dd gdtable          ; Base
 
 ; function: gdt_flush
-; Initialize the GDT
+;   Initialize the GDT
 global gdt_flush
 gdt_flush:
             sgdt [gdt_pointer]
-            mov ax, 0x10      
-            mov ds, ax
-            mov es, ax
-            mov fs, ax
+            mov ax, 0x10            ; 0x10 is the index of the second selector
+            mov ds, ax              ;   in the GDT. So, all the CPU registers
+            mov es, ax              ;   associated with data reading will use
+            mov fs, ax              ;   the 
             mov gs, ax
             mov ss, ax
             jmp 0x08:flush2 

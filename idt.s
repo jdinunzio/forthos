@@ -13,21 +13,36 @@
 ; This file is based on Bran's kernel development tutorial file start.asm
 
 [BITS 32]
+%include "forth_macros.s"
+section .text
+
+
+%define KERNEL_INIT_ADDR 0x100000
 
 ; macro: idt_entry
-; Create a idt_entry
+;   Create a idt_entry.
+;
+; Params:
+;   base  - The address of the isr.
+;   sel   - Selector (index) in the GDT of the segment on which the isr reside.
+;   flags - Flags of the isr.
 %macro idt_entry 3
             ; base, sel, flags
             %xdefine base %1
             dw base & 0xffff          ; dw base_lo
-            dw %2                   ; dw sel
-            db 0                    ; db always0
-            db %3                   ; db flags
+            dw %2                     ; dw sel
+            db 0                      ; db always0
+            db %3                     ; db flags
             dw base >> 16 & 0xffff    ; dw base_high
 %endmacro
 
+; macro: set_idt
+;   sets the base address of an idt_entry.
+;
+; Params:
+;   idt  - The address of the idt
+;   isr  - The address of the isr.
 %macro set_idt 2
-            ; addr, base
             mov ebx, %1
             mov eax, %2
             mov [ebx], ax
@@ -39,33 +54,35 @@
 %endmacro
 
 ; macro: isr_wo_error
-; Generate code to handle an ISR without error.
-;
-; It pushes the error code 0, the id of this ISR and then calls
-; to the isr_routine handler.
+;   Generate the code of an isr that handles an interruption that doesn't 
+;   put an  error code in the stack.
 ;
 ; Params:
-; id - The id of this ISR
+;   id - The id of this ISR
 %macro isr_wo_error 1
+            cli
             push byte 0
             push byte %1
             jmp isr_routine
 %endmacro
 
 ; macro: isr_with_error
-; Generate code to handle an ISR with error.
-;
-; It pushes the id for this ISR and then calls 
-; to the isr_routine handler.
+;   Generate the code of an isr that handles an interruption that puts an
+;   error code in the stack.
 ;
 ; Params:
-; id - The id of this ISR
+;   id - The id of this ISR
 %macro isr_with_error 1
+            cli
             push byte %1
             jmp isr_routine
 %endmacro
 
 ; macro: irq_handler
+;   Generate the code of an isr that handles an IRQ.
+;
+; Params:
+;   id - The id of this ISR
 %macro irq_handler 1
             cli
             push byte 0
@@ -73,8 +90,84 @@
             jmp irq_routine
 %endmacro
 
+; function isr_routine
+;   Main interrupt service routine.
+isr_routine:
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+
+    mov ax, 0x10   ; Load the Kernel Data Segment descriptor!
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    mov eax, esp   ; Push us the stack
+    push eax
+    mov eax, _int_routine
+    call eax       ; A special call, preserves the 'eip' register
+    pop eax
+
+    pop gs
+    pop fs
+    pop es
+    pop ds
+
+    popad
+    add esp, 8     ; Cleans up the pushed error code and pushed ISR number
+    iret 
+
+; function: irq_routine
+;   Main interrupt service routine for interrupts.
+irq_routine:
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    mov eax, esp
+    push eax
+    mov eax, _int_routine
+    call eax
+    pop eax
+
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+
+    add esp, 8
+    sti
+    iret
+
+; function int_routine
+;    invokes a forth word from assembly in such way that when the forth word
+;    ends, it return to the assembly word.
+_int_routine:
+    mov esi, _int_call
+    NEXT
+_int_routine_end: ret
+
+extern print_interrupt
+_int_call:          dd print_interrupt
+                    dd _int_call_end
+_int_call_end:      dd _int_routine_end
+
+    
+
 ; function: idt_load
-; Initialize the IDT
+;   Initialize the IDT and the IDT pointer register.
 global idt_load
 idt_load:
             set_idt idtable, isr0
@@ -128,73 +221,20 @@ idt_load:
             set_idt idtable + 8*46, isr46
             set_idt idtable + 8*47, isr47
 
-            sidt [idt_pointer]
+            lidt [idt_pointer]
             ret
 
-
-section .data
-; type: idt_pointer
-; Pointer to the IDT
-idt_pointer:
-            dw 8*256 -1    ; table limit
-            dd idtable      ; table base
-    
-; type: idtable
-; IDT
-idtable:
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-             idt_entry 0, 0x08, 0x8E            
-
-
-section .text
-
+; function: isr0 to isr 47
+;   Interrupt service routines.
+;
+;   After initializing the IDT, when the CPU receives interrupt n,
+;   the isr-n is called.
+; 
+;   Some interrupts put a byte in the stacks, others not. The isr
+;   associated to this kind of interruption put a zero in the stack
+;   to leave it in a homogeneous status. Each isr put in the stack
+;   a number of identification and then invoke isr_routine.
+;
 isr0:       isr_wo_error 0      ;  Division By Zero Exception, No
 isr1:       isr_wo_error 1      ;  Debug Exception, No
 isr2:       isr_wo_error 2      ;  Non Maskable Interrupt Exception, No
@@ -230,74 +270,96 @@ isr30:      isr_wo_error 30     ; Reserved
 isr31:      isr_wo_error 31     ; Reserved
 
 ; Interruptions
-isr32:      irq_handler 32      
-isr33:      irq_handler 33      
-isr34:      irq_handler 34      
-isr35:      irq_handler 35      
-isr36:      irq_handler 36      
-isr37:      irq_handler 37      
-isr38:      irq_handler 38      
-isr39:      irq_handler 39      
-isr40:      irq_handler 40      
-isr41:      irq_handler 41      
-isr42:      irq_handler 42      
-isr43:      irq_handler 43      
-isr44:      irq_handler 44      
-isr45:      irq_handler 45      
-isr46:      irq_handler 46      
-isr47:      irq_handler 47      
+isr32:      irq_handler 32
+isr33:      irq_handler 33
+isr34:      irq_handler 34
+isr35:      irq_handler 35
+isr36:      irq_handler 36
+isr37:      irq_handler 37
+isr38:      irq_handler 38
+isr39:      irq_handler 39
+isr40:      irq_handler 40
+isr41:      irq_handler 41
+isr42:      irq_handler 42
+isr43:      irq_handler 43
+isr44:      irq_handler 44
+isr45:      irq_handler 45
+isr46:      irq_handler 46
+isr47:      irq_handler 47
 
-; function isr_routine
-isr_routine:
-    pusha
-    push ds
-    push es
-    push fs
-    push gs
-    mov ax, 0x10   ; Load the Kernel Data Segment descriptor!
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov eax, esp   ; Push us the stack
-    push eax
-
-        ; mov eax, _fault_handler
-        ; call eax       ; A special call, preserves the 'eip' register
-
-    pop eax
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popa
-    add esp, 8     ; Cleans up the pushed error code and pushed ISR number
-    iret 
-
-; function: irq_routine
-irq_routine:
-    pusha
-    push ds
-    push es
-    push fs
-    push gs
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov eax, esp
-    push eax
+section .data
+; var: idt_pointer
+;   Pointer to the IDT
+idt_pointer:
+            dw 8*256 -1     ; table limit
+            dd idtable      ; table base
     
-        ; mov eax, _irq_handler
-        ; call eax
+; var: idtable
+;   IDT
+idtable:
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
 
-    pop eax
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popa
-    add esp, 8
-    iret
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0x08, 0x8E
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
+             idt_entry 0, 0, 0
 

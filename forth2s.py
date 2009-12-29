@@ -181,7 +181,7 @@ def get_symbols():
     It is used to translate forth words with symbols in it.
     '''
     dct = {}
-    lines = commands.getoutput("grep '^def[vc]' *.s *.fth").splitlines()
+    lines = commands.getoutput("grep '^def[vcw]' *.s *.fth").splitlines()
     lines.extend(commands.getoutput("grep '^: ' *.fth").splitlines())
     for line in lines:
         parts = line.split()

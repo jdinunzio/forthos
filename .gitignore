@@ -2,4 +2,13 @@
 *.o
 floppy.img
 kernel
+bochs
+forth_core.h
+forth_words.h
+kernel_kbd.h
+kernel_test.h
+kernel_video.h
+kernel_words.h
+kernel_video.s
+tmp/
 docs/*
