@@ -294,3 +294,20 @@
         %pop
 %endmacro
 
+
+%macro call_forth 1
+            push esi
+            mov esi, %%forthcode
+            NEXT
+    %%end:  pop esi
+
+    section .rodata
+    %%forthcode:
+            dd %1
+            dd %%call_end
+    %%call_end:
+            dd %%end
+    section .text
+%endmacro
+
+

@@ -60,7 +60,7 @@ global print_interrupt
 ;
 
 defcode test_irq, test_irq, 0
-    int 32
+    int 33
     NEXT
 
 : div_by_zero, div_by_zero, 0
@@ -75,7 +75,8 @@ defcode test_irq, test_irq, 0
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
-    test_irq
+    #test_irq
+    #test_irq
     s_hello PRINTCSTRING CR
     #div_by_zero
     print_scancodes

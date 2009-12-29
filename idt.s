@@ -107,7 +107,7 @@ isr_routine:
 
     mov eax, esp   ; Push us the stack
     push eax
-    mov eax, _int_routine
+    mov eax, _isr_routine
     call eax       ; A special call, preserves the 'eip' register
     pop eax
 
@@ -120,6 +120,7 @@ isr_routine:
     add esp, 8     ; Cleans up the pushed error code and pushed ISR number
     iret 
 
+extern forth_irq_handler
 ; function: irq_routine
 ;   Main interrupt service routine for interrupts.
 irq_routine:
@@ -151,20 +152,18 @@ irq_routine:
     sti
     iret
 
-; function int_routine
-;    invokes a forth word from assembly in such way that when the forth word
-;    ends, it return to the assembly word.
+; function _isr_routine
+;    invokes the forth word that handles the exceptions.
+_isr_routine:
+    ;call_forth forth_isr_routine
+    ret
+
+; function _int_routine
+;    invokes the forth word that handles the interrups.
 _int_routine:
-    mov esi, _int_call
-    NEXT
-_int_routine_end: ret
+    call_forth forth_irq_handler
+    ret
 
-extern print_interrupt
-_int_call:          dd print_interrupt
-                    dd _int_call_end
-_int_call_end:      dd _int_routine_end
-
-    
 
 ; function: idt_load
 ;   Initialize the IDT and the IDT pointer register.
@@ -223,6 +222,37 @@ idt_load:
 
             lidt [idt_pointer]
             ret
+
+
+global irq_init
+irq_init:
+        mov al, 0x11
+        out 0x20, al
+        out 0xA0, al
+        mov al, 0x20
+        out 0x21, al
+        mov al, 0x28
+        out 0xA1, al
+        mov al, 0x04
+        out 0x21, al
+        mov al, 0x02
+        out 0xA1, al
+        mov al, 0x01
+        out 0x21, al
+        out 0xA1, al
+        mov al, 0
+        out 0x21, al
+        out 0xA1, al
+
+        ; TEST - Disable all interrupts but keyboard
+        mov al, 0xfd
+        out 0x21, al
+        mov al, 0xff
+        out 0xa1, al
+        sti
+ 
+        ret
+
 
 ; function: isr0 to isr 47
 ;   Interrupt service routines.
@@ -346,20 +376,4 @@ idtable:
              idt_entry 0, 0x08, 0x8E
              idt_entry 0, 0x08, 0x8E
              idt_entry 0, 0x08, 0x8E
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
-             idt_entry 0, 0, 0
 

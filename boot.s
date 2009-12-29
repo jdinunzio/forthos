@@ -39,6 +39,7 @@ global start                    ; Kernel entry point.
 extern main                     ; This is the entry point of our C code
 extern gdt_flush
 extern idt_load
+extern irq_init
 
 ; function: start
 ; Entry point for grub.
@@ -47,6 +48,7 @@ start:
   cli                           ; Disable interrupts.
   call gdt_flush                ; Initialize GDT
   call idt_load                 ; Initialize IDT
+  call irq_init                 ; Initialize IRQs
   call main                     ; call our main() function.
   jmp $                         ; Enter an infinite loop, to stop the processor
                                 ; executing whatever rubbish is in the memory
