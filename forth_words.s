@@ -646,3 +646,12 @@ defword N_BYTE, N_BYTE, 0
     dd AND
     dd EXIT
 
+; function: EXECUTE
+;   Executes the word which address in in the stack
+;
+; stack:
+;   addr -- ??
+defcode EXECUTE, EXECUTE, 0
+        pop eax
+        jmp eax
+

@@ -51,6 +51,7 @@ global print_interrupt
     16 SHR 0xFFFF AND
 ;
 
+; prints an idt entry
 : print_idtentry, print_idtentry, 0
     DUP 4 + @   SWAP @              # wh wl
     DUP hi hexprint SPC EMIT        # sel
@@ -59,29 +60,44 @@ global print_interrupt
         lo 8 SHR hexprint CR        # flags
 ;
 
+; test irq
 defcode test_irq, test_irq, 0
     int 33
     NEXT
 
+; divide by zero
 : div_by_zero, div_by_zero, 0
     2 0 / DROP
 ;
 
+; Print hello word
+%define s_hello hello
+: print_hello, print_hello, 0
+    s_hello PRINTCSTRING CR
+;
+
+;%define _invoke_addr print_hello
+%define _invoke_addr 0x00101f58
+: test_invoke, test_invoke, 0
+    _invoke_addr EXECUTE
+;
+
 ; function: MAIN
-; The first forth word invoked by the kernel.
+; The first forth word d by the kernel.
 %define s_hello hello
 : MAIN, MAIN, 0
     CLEAR
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
-    #test_irq
-    #test_irq
-    s_hello PRINTCSTRING CR
-    #div_by_zero
+    # print_hello
+    test_invoke
     print_scancodes
 ;
 
 section .rodata
 hello:  db "hello, world", 0
 fault:  db "A fault happened", 0
+
+;invoke_addr: dd print_hello
+invoke_addr: dd 0x00101f58
