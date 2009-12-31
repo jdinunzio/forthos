@@ -119,19 +119,26 @@ defcode BG, BG, 0
 ; Stack
 ;   --
 : SCREEN_SCROLL, SCREEN_SCROLL, 0
-    SCREEN DUP 160 + SWAP 1920 CMOVE
+    SCREEN   DUP 160 +   SWAP   3840 CMOVE
     # TODO - Clean last line, move cursor
+    _CLEAN_LAST_LINE
+;
+
+: _CLEAN_LAST_LINE, _CLEAN_LAST_LINE, 0
+    SCREEN  DUP 4000 + SWAP 3840 + do
+        SCREEN_COLOR @ OVER W! 1+
+    loop
 ;
 
 ; function: SCREEN_SCROLL_
-;   Scrolls the screen if the cursor goes beyond line 25.
+;   Scrolls the screen if the cursor goes beyond line 24.
 ;
 ; Stack:
 ;   --
 : SCREEN_SCROLL_, SCREEN_SCROLL_, 0
-    CURSOR_POS_Y @ 25 > if
+    CURSOR_POS_Y @ 24 > if
         SCREEN_SCROLL
-        25 CURSOR_POS_Y !
+        24 CURSOR_POS_Y !
     then
 ;
 
@@ -144,6 +151,7 @@ defcode BG, BG, 0
     1 CURSOR_POS_X @ + 80 /MOD
     CURSOR_POS_Y +!
     CURSOR_POS_X !
+    SCREEN_SCROLL_
 ;
 
 ; function: C>CW, CHAR_TO_CHARWORD
@@ -213,6 +221,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
     1 CURSOR_POS_Y +!
     0 CURSOR_POS_X !
     AT_HW
+    SCREEN_SCROLL_
 ;
 		 	
 ; function: TAB
