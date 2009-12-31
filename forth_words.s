@@ -653,5 +653,5 @@ defword N_BYTE, N_BYTE, 0
 ;   addr -- ??
 defcode EXECUTE, EXECUTE, 0
         pop eax
-        jmp eax
+        jmp [eax]
 

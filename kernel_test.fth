@@ -76,8 +76,7 @@ defcode test_irq, test_irq, 0
     s_hello PRINTCSTRING CR
 ;
 
-;%define _invoke_addr print_hello
-%define _invoke_addr 0x00101f58
+%define _invoke_addr print_hello
 : test_invoke, test_invoke, 0
     _invoke_addr EXECUTE
 ;
