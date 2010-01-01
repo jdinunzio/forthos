@@ -34,3 +34,14 @@ defcode INB, INB, 0
         push eax
         NEXT
 
+; b3b2b1b0 -- 0000b1b0
+: lo, lo, 0
+    0xFFFF AND
+;
+
+; b3b2b1b0 -- 0000b1b0
+: hi, hi, 0
+    16 SHR 0xFFFF AND
+;
+
+

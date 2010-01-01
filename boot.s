@@ -40,6 +40,7 @@ extern main                     ; This is the entry point of our C code
 extern gdt_flush
 extern idt_load
 extern irq_init
+extern pit_init
 
 ; function: start
 ; Entry point for grub.
@@ -49,6 +50,7 @@ start:
   call gdt_flush                ; Initialize GDT
   call idt_load                 ; Initialize IDT
   call irq_init                 ; Initialize IRQs
+  call pit_init                 ; Initialize the PIT
   call main                     ; call our main() function.
   jmp $                         ; Enter an infinite loop, to stop the processor
                                 ; executing whatever rubbish is in the memory

@@ -12,24 +12,6 @@
 %define Fault fault
 
 [BITS 32]
-; function: intprint
-;   Prints an integer. TODO - move to another file
-;
-; stack:
-;   n --
-: intprint, intprint, 0
-    10 /MOD
-    DUP 0<> if  intprint  else  DROP  then
-    '0' + EMIT
-;
-
-: hexprint, hexprint, 0
-    16 /MOD
-    DUP 0<> if hexprint else DROP then
-    DUP 10 < if '0' else 'A' 10 - then
-    + EMIT
-;
-
 global print_scancodes
 : print_scancodes, print_scancodes, 0
     begin KBD_SCANCODE intprint SPC EMIT 0 until
@@ -39,16 +21,6 @@ global print_interrupt
 %define _fault fault
 : print_interrupt, print_interrupt, 0
     _fault PRINTCSTRING CR 
-;
-
-; b3b2b1b0 -- 0000b1b0
-: lo, lo, 0
-    0xFFFF AND
-;
-
-; b3b2b1b0 -- 0000b1b0
-: hi, hi, 0
-    16 SHR 0xFFFF AND
 ;
 
 ; prints an idt entry

@@ -234,3 +234,22 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
     8 CURSOR_POS_X +! AT_HW
 ;
 
+; function: intprint
+;   Prints an integer. TODO - move to another file
+;
+; stack:
+;   n --
+: intprint, intprint, 0
+    10 /MOD
+    DUP 0<> if  intprint  else  DROP  then
+    '0' + EMIT
+;
+
+: hexprint, hexprint, 0
+    16 /MOD
+    DUP 0<> if hexprint else DROP then
+    DUP 10 < if '0' else 'A' 10 - then
+    + EMIT
+;
+
+

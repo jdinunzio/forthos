@@ -225,7 +225,10 @@ idt_load:
 
 
 global irq_init
+; function: irq_init
+;   Initialize the IRQ handling.
 irq_init:
+        ; Magic happens here
         mov al, 0x11
         out 0x20, al
         out 0xA0, al
@@ -244,8 +247,8 @@ irq_init:
         out 0x21, al
         out 0xA1, al
 
-        ; TEST - Disable all interrupts but keyboard
-        mov al, 0xfd
+        ; TEST - Disable all interrupts but keyboard and clock
+        mov al, 0xfc
         out 0x21, al
         mov al, 0xff
         out 0xa1, al
