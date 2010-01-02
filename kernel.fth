@@ -30,12 +30,12 @@ cold_start:
 extern pit_init
 extern irq_init
 extern idt_init
-defword  MAIN, MAIN, 0
-        dd idt_init
-        dd pit_init
-        dd irq_init
-        dd MAIN_TEST
-        dd EXIT
+: MAIN, MAIN, 0
+    idt_init
+    pit_init
+    irq_init
+    MAIN_TEST
+;
 
 
 ; stacks
