@@ -1,6 +1,7 @@
 .*
 *.o
-*.h ! forth.h
+*.h
+*.s
 floppy.img
 kernel
 bochs

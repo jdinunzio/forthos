@@ -29,15 +29,10 @@ defvar screen_color, screen_color, 0, 0x0f00
 ;
 ; Stack
 ;   -- cursor_pos_rel
-defword cursor_pos_rel, cursor_pos_rel, 0
-            dd cursor_pos_y, fetch
-            litn 160
-            dd mul
-            dd cursor_pos_x, fetch
-            litn 2
-            dd mul
-            dd add
-            dd exit
+: cursor_pos_rel, cursor_pos_rel, 0
+    cursor_pos_y @ 160 *
+    cursor_pos_x @   2 * +
+;
 
 ; function: cursor_pos
 ;   Returns the absolute address of the cursor.
@@ -80,14 +75,14 @@ defword cursor_pos_rel, cursor_pos_rel, 0
 ; Stack:
 ;   color --
 defcode ink, ink, 0
-            pop eax
-            and eax, 0x0f
-            shl eax, 8
-            mov ebx, [var_screen_color]
-            and ebx, 0xf000
-            or eax, ebx
-            mov [var_screen_color], eax
-            next
+        pop eax
+        and eax, 0x0f
+        shl eax, 8
+        mov ebx, [var_screen_color]
+        and ebx, 0xf000
+        or eax, ebx
+        mov [var_screen_color], eax
+        next
 
 ; function: bg
 ;   Sets the background color.
@@ -95,14 +90,14 @@ defcode ink, ink, 0
 ; Stack:
 ;   color --
 defcode bg, bg, 0
-            pop eax
-            and eax, 0x0f
-            shl eax, 12
-            mov ebx, [var_screen_color]
-            and ebx, 0x0f00
-            or eax, ebx
-            mov [var_screen_color], eax
-            next
+        pop eax
+        and eax, 0x0f
+        shl eax, 12
+        mov ebx, [var_screen_color]
+        and ebx, 0x0f00
+        or eax, ebx
+        mov [var_screen_color], eax
+        next
 
 ; function:  bright
 ;   Takes a color and returns its brighter version.
@@ -162,13 +157,12 @@ defcode bg, bg, 0
 ; Stack:
 ;   char -- charword
 defcode c>cw, char_to_charword, 0
-            pop eax
-            and eax, 0xff
-            mov ebx, [var_screen_color]
-            ;shl ebx, 8
-            or eax, ebx
-            push eax
-            next
+        pop eax
+        and eax, 0xff
+        mov ebx, [var_screen_color]
+        or eax, ebx
+        push eax
+        next
 
 
 ; function: emitcw
@@ -250,6 +244,12 @@ defcode c>cw, char_to_charword, 0
     '0' + emit
 ;
 
+; function: hexprint
+;   Prints an integer in hexadecimal.
+;   TODO - move to another file
+;
+; stack:
+;   n --
 : hexprint, hexprint, 0
     16 /mod
     dup 0<> if hexprint else drop then

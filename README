@@ -1,6 +1,7 @@
-FORTHOS
+FORTHOS:
+========
 
-A forth interpreter as a operative system.
+A forth operative system (and, in the future, interpreter).
 
 This is based on :
 "A FORTH compiler and tutorial - a step-by-step implementation of a FORTH 
@@ -10,4 +11,48 @@ http://www.osdever.net/bkerndev/Docs/title.htm
 
 Port to nasm started by jdinuncio (José Dinuncio)
 August (augustulus@freenet) tested the kernel with  qemu.
+
+
+CURRENT STATUS:
+===============
+
+In this point, forthos initialize the GDT, IDT and PIT. It has drivers for 
+text video and keyboard.
+
+
+REQUIREMENTS:
+=============
+
+*) nasm
+*) GNU make
+*) python >= 2.4
+*) qemu >= 0.11
+
+
+GETTING FORTHOS:
+================
+
+To get forthos, you'll need git. You can get a copy from 
+git@github.com:jdinuncio/forthos.git. In linux you can type:
+
+    $ git clone git@github.com:jdinuncio/forthos.git
+
+
+COMPILATION:
+============
+
+    $ cd forthos
+    $ make clean
+    $ make kernel
+    $ make image
+
+
+INSTALATION AND RUNNING:
+========================
+
+forthos runs as a virtual machine inside qemu. It doesn't need to be installed
+and it doesn't touch any file outside its directory. To run it, type:
+
+    $ make run
+
 

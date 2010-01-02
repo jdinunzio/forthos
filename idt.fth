@@ -1,4 +1,4 @@
-; program: idt.s
+; program: idt.fth
 ; Initialize the IDT.
 ;
 ; Sets:
@@ -16,6 +16,7 @@
 %include "forth.h"
 section .text
 
+; function: set_idt
 ;   sets an IDT entry.
 ;
 ; stack:
@@ -85,13 +86,19 @@ defcode set_idt, set_idt, 0
              isr47   idtable 8 47 * +   set_idt
 ;
 
+; function: set_idtr
+;   Sets the idt pointer register.
+;
+;   It sets the idtr to a constant value.
 defcode set_idtr, set_idtr, 0
         lidt [idt_pointer]
         next
 
+; function: idt_init
+;   Initialize the idt
 : idt_init, idt_init, 0
-        idt_set_table
-        set_idtr
+    idt_set_table
+    set_idtr
 ;
 
 section .text
@@ -103,10 +110,10 @@ section .text
 ; Params:
 ;   id - The id of this ISR
 %macro isr_wo_error 1
-            cli
-            push byte 0
-            push byte %1
-            jmp isr_routine
+        cli
+        push byte 0
+        push byte %1
+        jmp isr_routine
 %endmacro
 
 ; macro: isr_with_error
@@ -116,9 +123,9 @@ section .text
 ; Params:
 ;   id - The id of this ISR
 %macro isr_with_error 1
-            cli
-            push byte %1
-            jmp isr_routine
+        cli
+        push byte %1
+        jmp isr_routine
 %endmacro
 
 ; macro: irq_handler
@@ -127,42 +134,42 @@ section .text
 ; Params:
 ;   id - The id of this ISR
 %macro irq_wo_error 1
-            cli
-            push byte 0
-            push byte %1
-            jmp irq_routine
+        cli
+        push byte 0
+        push byte %1
+        jmp irq_routine
 %endmacro
 
 ; macro: interrupt_routine
 ;   Define the isr_routine and irq_routine
 %macro interrupt_routine 1
-    pushad
-    push ds
-    push es
-    push fs
-    push gs
+        pushad
+        push ds
+        push es
+        push fs
+        push gs
 
-    mov ax, 0x10   ; Load the Kernel Data Segment descriptor!
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+        mov ax, 0x10   ; Load the Kernel Data Segment descriptor!
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
 
-    mov eax, esp   ; Push us the stack
-    push eax
-    mov eax, %1
-    call eax       ; A special call, preserves the 'eip' register
-    pop eax
+        mov eax, esp   ; Push us the stack
+        push eax
+        mov eax, %1
+        call eax       ; A special call, preserves the 'eip' register
+        pop eax
 
-    pop gs
-    pop fs
-    pop es
-    pop ds
+        pop gs
+        pop fs
+        pop es
+        pop ds
 
-    popad
-    add esp, 8     ; Cleans up the pushed error code and pushed ISR number
-    sti
-    iret
+        popad
+        add esp, 8      ; Cleans up the pushed error code and pushed ISR number
+        sti
+        iret
 %endmacro
 
 isr_routine: interrupt_routine _isr_routine
@@ -171,15 +178,15 @@ irq_routine: interrupt_routine _irq_routine
 ; function _isr_routine
 ;    invokes the forth word that handles the exceptions.
 _isr_routine:
-    ;call_forth forth_isr_routine
-    ret
+        ;call_forth forth_isr_routine
+        ret
 
 ; function _irq_routine
 ;    invokes the forth word that handles the interrups.
 extern irq_handler
 _irq_routine:
-    call_forth irq_handler
-    ret
+        call_forth irq_handler
+        ret
 
 ; function: isr0 to isr 47
 ;   Interrupt service routines.
@@ -248,8 +255,8 @@ section .data
 ; var: idt_pointer
 ;   Pointer to the IDT
 idt_pointer:
-            dw 8*256 -1     ; table limit
-            dd idtable      ; table base
+        dw 8*256 -1     ; table limit
+        dd idtable      ; table base
     
 ; var: idtable
 ;   IDT

@@ -47,10 +47,10 @@ defvar key_status, key_status, 0, 0
 ;
 
 ; function: kbd_scancode
-; Waits for a key pressed and returns its sacancode.
+;   Waits for a key pressed and returns its sacancode.
 ;
 ; Stack:
-; -- scancode
+;   -- scancode
 : kbd_scancode, kbd_scancode, 0
     begin kbd_buffer_full until
     kbd_scancode_now 0xFF and

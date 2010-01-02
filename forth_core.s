@@ -1,4 +1,4 @@
-; program: forth_core
+; program: forth_core.s
 ; The core functions of the forth interpreter.
 ;
 ; This file is a translation of jonesforth 
@@ -26,13 +26,13 @@ extern main
 ; | +---------------+
 ; | |     LINK      |  Link to the previous word
 ; | +---------------+
-; | |  FLAGS + leN  |  Several flags + length of the word name
+; | |  FLAGS + LEN  |  Several flags + length of the word name
 ; | +---------------+
 ; | |     NAME      |  Word name (4 bytes aligned)
 ; | +---------------+
-; | |   CODEword    |  Pointer to the routine that executes this word
+; | |   CODEWORD    |  Pointer to the routine that executes this word
 ; | +---------------+
-; | |     BODy      |  Optionally, if this is a defword, a serie of
+; | |     BODY      |  Optionally, if this is a defword, a serie of
 ; | +---------------+    pointers to the codewors of each word that
 ; | |     ...       |    define the current word.
 ; | +---------------+
@@ -56,7 +56,7 @@ extern main
 ; ============================================================================
 ; var: statE       
 ; Is the interpreter executing code (0) or compiling (non-zero)?
-defvar statE, statE, 0, 0
+defvar STATE, STATE, 0, 0
 
 ; var: HERE        
 ; Points to the next free byte of memory.
@@ -64,7 +64,7 @@ defvar HERE, HERE, 0, 0
 
 ; var LAtest       
 ; Points to the newset  word in the dictionary.
-defvar LAtest, LAtest, 0, main ; SySCALL0 must be last in built-in dictionary
+defvar LATEST, LATEST, 0, main ; SySCALL0 must be last in built-in dictionary
 
 ; var: S0          
 ; Stores the address of the top of the parameter stack.
@@ -115,15 +115,15 @@ align 4
 ;   codewords of other forth words. DOCOL executes each one of these codewords.
 global DOCOL
 DOCOL:
-            pushrsp esi         ; Saves the return point
-            add eax, 4          ; eax pointed to the codeword of this word,
-            mov esi, eax        ;   now esi points to the first word
-            next
+        pushrsp esi         ; Saves the return point
+        add eax, 4          ; eax pointed to the codeword of this word,
+        mov esi, eax        ;   now esi points to the first word
+        next
 
 ; function: exit
 ;   exit is the last word of a defword (a non-defcode word). It restores the 
 ;   value of esi, stored in the return stack by DOCOL when this word started.
 defcode exit, exit, 0
-            poprsp esi          ; Pops the address of the word to return to
-            next                ; and executes it
+        poprsp esi          ; Pops the address of the word to return to
+        next                ; and executes it
 
