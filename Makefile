@@ -58,7 +58,7 @@ irq.o: irq.h irq.s
 idt.o: idt.h idt.s
 
 # Generating documentation.
-# Be sure to add "s" to "Extensions:" in "Language: Assembly"
+# Be sure to add "s" and "fth" to "Extensions:" in "Language: Assembly"
 # in /usr/share/perl5/naturaldocs/Config/Languages.txt
 docs: 
 	$(naturaldocs) -i . -p docs -o HTML docs 
