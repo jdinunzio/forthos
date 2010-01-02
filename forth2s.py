@@ -198,9 +198,14 @@ def get_literals():
     
     It is used to translate literals.
     '''
+    # Get 'define' literals
     defs = commands.getoutput("grep '^%define ' *.s *.fth").splitlines()
-    lits = [x.split()[1] for x in defs]
-    return lits
+    defs = [x.split()[1] for x in defs]
+    # Get labels
+    labels = commands.getoutput(
+            "grep '^[:space:]*[A-Za-z0-9_]\+:' *.s *.fth").splitlines()
+    labels = [x.split(':')[1] for x in labels]
+    return defs + labels
 
 # Use this version for compile recursive definitions
 TRANSLATIONS = [tr_lit_n, tr_lit_s, tr_lit_lit, tr_macro, tr_symbol, tr_id]

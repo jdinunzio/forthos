@@ -7,7 +7,6 @@
 
 %include "forth.h"
 %include "kernel_words.h"
-%define SPC ' '
 
 [BITS 32]
 section .text
@@ -208,7 +207,7 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ;   char --
 : CLEAR, CLEAR, 0
     0 0 atx
-    2000 0 do SPC EMIT loop
+    2000 0 do SPC loop
     0 0 atx
 ;
 
@@ -222,6 +221,12 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
     0 CURSOR_POS_X !
     AT_HW
     SCREEN_SCROLL_
+;
+
+; function: SPC
+;   Prints a space
+: SPC, SPC, 0
+    32 EMIT
 ;
 		 	
 ; function: TAB

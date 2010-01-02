@@ -11,13 +11,8 @@
 %include "kernel_words.h"
 
 
-global pit_init
-pit_init:
-    call_forth pit_init_
-    ret
-
-: pit_init_, pit_init_, 0
+: pit_init, pit_init, 0
     0x43 0x36 OUTB
-    21931800  DUP hi SWAP lo
+    11931800  DUP hi SWAP lo
         0x40 OUTB   0x40 OUTB
 ;

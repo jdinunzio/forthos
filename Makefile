@@ -7,8 +7,8 @@ TEST_OBJS = forth_core.o forth_words.o test.o
 # Headers to clean
 DEL_H_OBJS = forth_core.h forth_words.h kernel.h
 # Objects which .h and .s files should be clean
-DEL_H_S_OBJS = kernel_kbd.fth  kernel_test.fth  kernel_video.fth  kernel_words.fth \
-			   kernel_pit.fth irq.fth test.fth
+DEL_H_S_OBJS = idt.fth kernel_kbd.fth  kernel_test.fth  kernel_video.fth  kernel_words.fth \
+			   kernel_pit.fth irq.fth test.fth kernel.fth
 
 LDFLAGS = -Tlink.ld  -melf_i386
 ASFLAGS = -g -felf32
@@ -53,7 +53,9 @@ kernel_video.o: kernel_words.h forth_words.h forth_core.h
 kernel_kbd.o: kernel_video.h kernel_video.s kernel_words.h forth_words.h forth_core.h
 kernel_pit.o: kernel_words.h forth_words.h forth_core.h
 kernel_test.o: kernel_kbd.h kernel_video.h kernel_words.h forth_words.h forth_core.h
+kernel.o: kernel.s 
 irq.o: irq.h irq.s
+idt.o: idt.h idt.s
 
 # Generating documentation.
 # Be sure to add "s" to "Extensions:" in "Language: Assembly"
