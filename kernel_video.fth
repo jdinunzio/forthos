@@ -11,149 +11,149 @@
 [BITS 32]
 section .text
 
-; var: SCREEN
+; var: screen
 ;   Address of the begining of the screen.
-defconst SCREEN, SCREEN, 0, 0xB8000
-; var: CURSOR_POS_X
+defconst screen, screen, 0, 0xB8000
+; var: cursor_pos_x
 ;    Position x of the cursor. In which column, form 0 to 79 the cursor is.
-defvar CURSOR_POS_X, CURSOR_POS_X, 0 , 0
-; var: CURSOR_POS_Y
+defvar cursor_pos_x, cursor_pos_x, 0 , 0
+; var: cursor_pos_y
 ;   Position y of the cursor. In which line, from 0 to 24 the cursor is.
-defvar CURSOR_POS_Y, CURSOR_POS_Y, 0 , 0
-; var: SCREEN_COLOR
+defvar cursor_pos_y, cursor_pos_y, 0 , 0
+; var: screen_color
 ;    The foreground and background colors to use.
-defvar SCREEN_COLOR, SCREEN_COLOR, 0, 0x0f00
+defvar screen_color, screen_color, 0, 0x0f00
 
-; function: CURSOR_POS_REL
+; function: cursor_pos_rel
 ;   Returns the cursor relative position respect to the origin of the screen
 ;
 ; Stack
 ;   -- cursor_pos_rel
-defword CURSOR_POS_REL, CURSOR_POS_REL, 0
-            dd CURSOR_POS_Y, FETCH
-            LITN 160
-            dd MUL
-            dd CURSOR_POS_X, FETCH
-            LITN 2
-            dd MUL
-            dd ADD
-            dd EXIT
+defword cursor_pos_rel, cursor_pos_rel, 0
+            dd cursor_pos_y, fetch
+            litn 160
+            dd mul
+            dd cursor_pos_x, fetch
+            litn 2
+            dd mul
+            dd add
+            dd exit
 
-; function: CURSOR_POS
+; function: cursor_pos
 ;   Returns the absolute address of the cursor.
 ;
 ; Stack
 ;   -- cursor_pos
-: CURSOR_POS, CURSOR_POS, 0
-    CURSOR_POS_REL SCREEN +
+: cursor_pos, cursor_pos, 0
+    cursor_pos_rel screen +
 ;
 
-; function: AT_HW
-;   Moves the cursor to the position indicated by CURSOR_POS variables.
+; function: at_hw
+;   Moves the cursor to the position indicated by cursor_pos variables.
 ;
 ; Stack:
 ;   --
-: AT_HW, AT_HW, 0
-    CURSOR_POS_REL          # Get the position of the cursor
-    14 0x3D4 OUTB           # Say you're going to send the high byte
-    DUP   1 N_BYTE          # ... get the higer byte
-    0x3D5 OUTB              # ... and send it
+: at_hw, at_hw, 0
+    cursor_pos_rel          # Get the position of the cursor
+    14 0x3D4 outb           # Say you're going to send the high byte
+    dup   1 n_byte          # ... get the higer byte
+    0x3D5 outb              # ... and send it
 
-    15 0x3D4 OUTB           # Say you're going to send the low bye
-      0x3D5 OUTB            # ... and send it
+    15 0x3D4 outb           # Say you're going to send the low bye
+      0x3D5 outb            # ... and send it
 ;
 
 ; function: atx
-;   Moves the cursor thoe the coordinates indicated. It updates the CURSOR_POS
+;   Moves the cursor thoe the coordinates indicated. It updates the cursor_pos
 ;   variables.
 ; 
 ; Stack:
 ;   y x --
 : atx, atx, 0
-    CURSOR_POS_X !
-    CURSOR_POS_Y !
+    cursor_pos_x !
+    cursor_pos_y !
 ;
 
-; function: INK
+; function: ink
 ;   Set the ink color.
 ;
 ; Stack:
 ;   color --
-defcode INK, INK, 0
+defcode ink, ink, 0
             pop eax
             and eax, 0x0f
             shl eax, 8
-            mov ebx, [var_SCREEN_COLOR]
+            mov ebx, [var_screen_color]
             and ebx, 0xf000
             or eax, ebx
-            mov [var_SCREEN_COLOR], eax
-            NEXT
+            mov [var_screen_color], eax
+            next
 
-; function: BG
+; function: bg
 ;   Sets the background color.
 ;
 ; Stack:
 ;   color --
-defcode BG, BG, 0
+defcode bg, bg, 0
             pop eax
             and eax, 0x0f
             shl eax, 12
-            mov ebx, [var_SCREEN_COLOR]
+            mov ebx, [var_screen_color]
             and ebx, 0x0f00
             or eax, ebx
-            mov [var_SCREEN_COLOR], eax
-            NEXT
+            mov [var_screen_color], eax
+            next
 
-; function:  BRIGHT
+; function:  bright
 ;   Takes a color and returns its brighter version.
 ;
 ; Stack:
 ;   color -- color
-: BRIGHT, BRIGHT, 0
+: bright, bright, 0
     8 +
 ;
 
-; function SCREEN_SCROLL
+; function screen_scroll
 ;
 ; Stack
 ;   --
-: SCREEN_SCROLL, SCREEN_SCROLL, 0
-    SCREEN   DUP 160 +   SWAP   3840 CMOVE
+: screen_scroll, screen_scroll, 0
+    screen   dup 160 +   swap   3840 cmove
     # TODO - Clean last line, move cursor
-    _CLEAN_LAST_LINE
+    _clean_last_line
 ;
 
-: _CLEAN_LAST_LINE, _CLEAN_LAST_LINE, 0
-    SCREEN  DUP 4000 + SWAP 3840 + do
-        SCREEN_COLOR @ OVER W! 1+
+: _clean_last_line, _clean_last_line, 0
+    screen  dup 4000 + swap 3840 + do
+        screen_color @ over w! 1+
     loop
 ;
 
-; function: SCREEN_SCROLL_
+; function: screen_scroll_
 ;   Scrolls the screen if the cursor goes beyond line 24.
 ;
 ; Stack:
 ;   --
-: SCREEN_SCROLL_, SCREEN_SCROLL_, 0
-    CURSOR_POS_Y @ 24 > if
-        SCREEN_SCROLL
-        24 CURSOR_POS_Y !
+: screen_scroll_, screen_scroll_, 0
+    cursor_pos_y @ 24 > if
+        screen_scroll
+        24 cursor_pos_y !
     then
 ;
 
-; function: CURSOR_FORWARD
+; function: cursor_forward
 ;   Moves the cursor forward.
 ;
 ; Stack:
 ;   --
-: CURSOR_FORWARD, CURSOR_FORWARD, 0
-    1 CURSOR_POS_X @ + 80 /MOD
-    CURSOR_POS_Y +!
-    CURSOR_POS_X !
-    SCREEN_SCROLL_
+: cursor_forward, cursor_forward, 0
+    1 cursor_pos_x @ + 80 /mod
+    cursor_pos_y +!
+    cursor_pos_x !
+    screen_scroll_
 ;
 
-; function: C>CW, CHAR_TO_CHARWORD
+; function: c>cw, char_to_charword
 ;   Converts a character in a charword.
 ;
 ;   A charword is a 16bits word with information about the character to be 
@@ -161,82 +161,82 @@ defcode BG, BG, 0
 ;
 ; Stack:
 ;   char -- charword
-defcode C>CW, CHAR_TO_CHARWORD, 0
+defcode c>cw, char_to_charword, 0
             pop eax
             and eax, 0xff
-            mov ebx, [var_SCREEN_COLOR]
+            mov ebx, [var_screen_color]
             ;shl ebx, 8
             or eax, ebx
             push eax
-            NEXT
+            next
 
 
-; function: EMITCW
+; function: emitcw
 ;   Prinst a character word
 ;
 ; Stack:
 ;   charword --
-: EMITCW, EMITCW, 0
-    CURSOR_POS W!
-    CURSOR_FORWARD
+: emitcw, emitcw, 0
+    cursor_pos w!
+    cursor_forward
 ;
 
-; function: EMIT
+; function: emit
 ;   Prinst a character.
 ;
 ; Stack:
 ;   char --
-: EMIT, EMIT, 0
-    C>CW EMITCW
+: emit, emit, 0
+    c>cw emitcw
 ;
 
-; function: PRINTCSTRING
+; function: printcstring
 ;   Prints a C string
 ;
 ; Stack:
 ;   &string --
-: PRINTCSTRING, PRINTCSTRING, 0
-    begin DUP C@ DUP while EMIT 1+ repeat
-    2DROP
+: printcstring, printcstring, 0
+    begin dup c@ dup while emit 1+ repeat
+    2drop
 ;
             
-; function: CLEAR 
+; function: clear 
 ;   Clear the screen
 ;
 ; Stack:
 ;   char --
-: CLEAR, CLEAR, 0
+: clear, clear, 0
     0 0 atx
-    2000 0 do SPC loop
+    2000 0 do spc loop
     0 0 atx
 ;
 
-; function: CR            
-;   Prints a CR
+; function: cr            
+;   Prints a cr
 ;
 ; Stack:
 ;    --
-: CR, CR, 0
-    1 CURSOR_POS_Y +!
-    0 CURSOR_POS_X !
-    AT_HW
-    SCREEN_SCROLL_
+: cr, cr, 0
+    1 cursor_pos_y +!
+    0 cursor_pos_x !
+    at_hw
+    screen_scroll_
 ;
 
-; function: SPC
+; function: spc
 ;   Prints a space
-: SPC, SPC, 0
-    32 EMIT
+: spc, spc, 0
+    32 emit
 ;
 		 	
-; function: TAB
-;   Prints a TAB.
+; function: tab
+;   Prints a tab.
 ;
 ; Stack:
 ;   --
-: TAB, TAB, 0
+: tab, tab, 0
     # TODO - Move to the next column multiple of 8
-    8 CURSOR_POS_X +! AT_HW
+    8 cursor_pos_x +! at_hw
 ;
 
 ; function: intprint
@@ -245,16 +245,16 @@ defcode C>CW, CHAR_TO_CHARWORD, 0
 ; stack:
 ;   n --
 : intprint, intprint, 0
-    10 /MOD
-    DUP 0<> if  intprint  else  DROP  then
-    '0' + EMIT
+    10 /mod
+    dup 0<> if  intprint  else  drop  then
+    '0' + emit
 ;
 
 : hexprint, hexprint, 0
-    16 /MOD
-    DUP 0<> if hexprint else DROP then
-    DUP 10 < if '0' else 'A' 10 - then
-    + EMIT
+    16 /mod
+    dup 0<> if hexprint else drop then
+    dup 10 < if '0' else 'A' 10 - then
+    + emit
 ;
 
 

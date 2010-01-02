@@ -3,8 +3,8 @@
 ; 12/2009
 
 %include "forth.h"
-global MAIN
-extern MAIN_TEST
+global main
+extern main_test
 
 [BITS 32]
 section .text
@@ -17,24 +17,24 @@ main:
 			mov [var_S0], esp 			; Save the initial data stack pointer in FORTH variable S0.
             mov ebp, return_stack_top   ; init the return stack
             mov esi, cold_start         ; fist foth word to exec
-            NEXT
+            next
 
 section .rodata
 
-; Bridge to the forth's word MAIN
+; Bridge to the forth's word main
 cold_start:
-            dd MAIN
+            dd main_kernel
 
 ; function: main
 ;   Firts foth word to be executed by the kernel
 extern pit_init
 extern irq_init
 extern idt_init
-: MAIN, MAIN, 0
+: main_kernel, main_kernel, 0
     idt_init
     pit_init
     irq_init
-    MAIN_TEST
+    main_test
 ;
 
 

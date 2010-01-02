@@ -7,7 +7,7 @@
 %include "forth.h"
 
 [BITS 32]
-; function: OUTB
+; function: outb
 ;   Executes an out assembly instruction
 ;
 ; Stack:
@@ -16,32 +16,32 @@
 ; Parameters:
 ;   val - The value to out. Byte.
 ;   port - The port to output the value. int16.
-defcode OUTB, OUTB, 0
+defcode outb, outb, 0
         pop edx
         pop eax
         out dx, al
-        NEXT
+        next
 
-; function: INB
+; function: inb
 ;   Executes an IN assembly instruction
 ;
 ; Stack:
 ;   port -- val
-defcode INB, INB, 0
+defcode inb, inb, 0
         pop edx
         xor eax, eax
         in  al, dx
         push eax
-        NEXT
+        next
 
 ; b3b2b1b0 -- 0000b1b0
 : lo, lo, 0
-    0xFFFF AND
+    0xFFFF and
 ;
 
 ; b3b2b1b0 -- 0000b1b0
 : hi, hi, 0
-    16 SHR 0xFFFF AND
+    16 shr 0xFFFF and
 ;
 
 

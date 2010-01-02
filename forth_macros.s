@@ -24,28 +24,28 @@
             %define LINK 0           ; Address of the last header word
 
 
-; macro: NEXT
+; macro: next
 ; Execute the next forth word.
 ;
 ; Every defcode (a forth word coded in assembly) must end with this macro.
 ; It loads in eax the dword which address is in esi and increments esi.
 ; Then, it jumps to the address in eax. In this way, esi always contains the
 ; address of the next word to execute.
-%macro NEXT 0
+%macro next 0
             lodsd                   ; eax <- mem[esi], esi <- esi+4
             jmp [eax]
 %endmacro
 
-; macro: PUSHRSP
+; macro: pushrsp
 ; Push the return stack
-%macro PUSHRSP 1
+%macro pushrsp 1
             lea ebp, [ebp-4]
             mov [ebp], %1
 %endmacro
 
-; macro: POPRSP
+; macro: poprsp
 ; Pop the return stack
-%macro POPRSP 1
+%macro poprsp 1
             mov %1, [ebp]
             lea ebp, [ebp+4]
 %endmacro
@@ -54,7 +54,7 @@
 ; Define a forth word.
 ;
 ; A forth word is a serie of pointers to the codewords that implement it. It
-; must end with the EXIT word.
+; must end with the exit word.
 ;
 ; Parameters:
 ; name - The forth name of the word.
@@ -85,7 +85,7 @@
 ; Define a forth code word, a forth word implemented in assembler.
 ;
 ; The body of a code word is an assebler routine. The routine must end
-; with the NEXT macro to make the forth interpreter execute the next
+; with the next macro to make the forth interpreter execute the next
 ; operation.
 ;
 ; Parameters:
@@ -129,7 +129,7 @@
 %macro defvar 4
             defcode %1, %2, %3
             push var_%2
-            NEXT
+            next
     section .data
             align 4
     global var_%2
@@ -149,36 +149,36 @@
 %macro defconst 4
             defcode %1, %2, %3
             push %4
-            NEXT
+            next
 %endmacro
 
-; macro:  LITN
+; macro:  litn
 ; Insert in a forth word a literal value.
 ;
 ; Parametes:
 ; v - The literal value.
-%macro LITN 1
-            dd LIT
+%macro litn 1
+            dd lit
             dd %1
 %endmacro
 
-; macro: branch
-; Unconditional branch
+; macro: branch_
+; Unconditional branch_
 ;
 ; Parameters:
-; label - The label to branch to.
-%macro branch 1
-        dd BRANCH 
+; label - The label to branch_ to.
+%macro branch_ 1
+        dd branch 
         dd %1 - $
 %endmacro
 
-; macro: zbranch
-; Branch if zero
+; macro: zbranch_
+; branch_ if zero
 ;
 ; Parameters:
-; label - The label to branch to.
-%macro zbranch 1
-        dd ZBRANCH 
+; label - The label to branch_ to.
+%macro zbranch_ 1
+        dd zbranch 
         dd %1 - $
 %endmacro
 
@@ -195,14 +195,14 @@
 ; | action then
 %macro if 0
         %push if_cond
-        zbranch %$ifnot
+        zbranch_ %$ifnot
 %endmacro
 
 ; macro: else
 ; The ELSE part of the if-else-then structure.
 %macro else 0
         %repl else_cond
-        branch %$exit
+        branch_ %$exit
     %$ifnot:
 %endmacro
 
@@ -220,27 +220,27 @@
 ; The DO part of do-loop structure.
 ; 
 ;  e.g.:
-;  |        LITN 80*25              ; for i = 0 to 80*25
-;  |        LITN 0                  ;
+;  |        litN 80*25              ; for i = 0 to 80*25
+;  |        litN 0                  ;
 ;  |        do
-;  |             LITN ' '           ;   emit ' '
-;  |             dd EMIT            ;
+;  |             litN ' '           ;   emit ' '
+;  |             dd emit            ;
 ;  |        loop
 %macro do 0
         %push do_loop
     %$loop:
-        dd TWODUP
-        dd GE
-        zbranch %$exit
+        dd twodup
+        dd ge
+        zbranch_ %$exit
 %endmacro
 
 ; macro: loop
 ; The LOOP part of the do-loop structure.
 %macro loop 0
-        dd INCR
-        branch %$loop
+        dd incr
+        branch_ %$loop
     %$exit:
-        dd DROP, DROP
+        dd drop, drop
         %pop
 %endmacro
 
@@ -261,7 +261,7 @@
 ; macro: until
 ; the UNTIL part of the begin-until structure.
 %macro until 0
-        zbranch %$loop
+        zbranch_ %$loop
     %$exit:
         %pop
 %endmacro
@@ -271,18 +271,18 @@
 ; 
 ;  e.g :
 ;  | begin
-;  |    dd DUP, FETCHBYTE, DUP
+;  |    dd dup, fetchbyte, dup
 ;  | while
-;  |    dd EMIT, INCR
+;  |    dd emit, incr
 ;  | repeat
 %macro while 0
-        zbranch %$exit
+        zbranch_ %$exit
 %endmacro
 
 ; macro: repeat
 ; The REPEAT part of the begin-while-repeat structure.
 %macro repeat 0
-        branch %$loop
+        branch_ %$loop
     %$exit:
         %pop
 %endmacro
@@ -290,7 +290,7 @@
 ; macro: leave
 ; Exit the current loop.
 %macro leave 0
-        branch %$exit
+        branch_ %$exit
         %pop
 %endmacro
 
@@ -298,7 +298,7 @@
 %macro call_forth 1
             push esi
             mov esi, %%forthcode
-            NEXT
+            next
     %%end:  pop esi
 
     section .rodata

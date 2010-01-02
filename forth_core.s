@@ -9,7 +9,7 @@
 ; This file is based on Bran's kernel development tutorial file start.asm
 
 %include "forth_macros.s"
-extern MAIN
+extern main
 
 [BITS 32]
 ; Topic: forth core
@@ -26,45 +26,45 @@ extern MAIN
 ; | +---------------+
 ; | |     LINK      |  Link to the previous word
 ; | +---------------+
-; | |  FLAGS + LEN  |  Several flags + length of the word name
+; | |  FLAGS + leN  |  Several flags + length of the word name
 ; | +---------------+
 ; | |     NAME      |  Word name (4 bytes aligned)
 ; | +---------------+
-; | |   CODEWORD    |  Pointer to the routine that executes this word
+; | |   CODEword    |  Pointer to the routine that executes this word
 ; | +---------------+
-; | |     BODY      |  Optionally, if this is a defword, a serie of
+; | |     BODy      |  Optionally, if this is a defword, a serie of
 ; | +---------------+    pointers to the codewors of each word that
 ; | |     ...       |    define the current word.
 ; | +---------------+
 ;
-; The next word to be executed is pointed by the esi register. The NEXT macro
+; The next word to be executed is pointed by the esi register. The next macro
 ; is the responsable for its execution and the esi update.
 ;
 ; If the word to be executed is a defcode, its implementation is in assembly.
-; In this case, CODEWORD points directly to the assembly routine. The assembly
-; routine must end with the NEXT macro, to execute the next word.
+; In this case, CODEword points directly to the assembly routine. The assembly
+; routine must end with the next macro, to execute the next word.
 ;
 ; If the word to be executed is a defword, its codeword must point to DOCOL.
 ; DOCOL executes the word body. The word body is a serie of pointer to the
 ; codewords of each one of the words in this definition. DOCOL pushes on the
 ; *return stack* the address of the next word to execute and then executes
 ; one by one the words on the current word body. The word body must end with
-; the EXIT word to restore the address of the next word to execute.
+; the exit word to restore the address of the next word to execute.
 
 ; ============================================================================
 ;    Virtual Machine Variables
 ; ============================================================================
-; var: STATE       
+; var: statE       
 ; Is the interpreter executing code (0) or compiling (non-zero)?
-defvar STATE, STATE, 0, 0
+defvar statE, statE, 0, 0
 
 ; var: HERE        
 ; Points to the next free byte of memory.
 defvar HERE, HERE, 0, 0
 
-; var LATEST       
+; var LAtest       
 ; Points to the newset  word in the dictionary.
-defvar LATEST, LATEST, 0, MAIN ; SYSCALL0 must be last in built-in dictionary
+defvar LAtest, LAtest, 0, main ; SySCALL0 must be last in built-in dictionary
 
 ; var: S0          
 ; Stores the address of the top of the parameter stack.
@@ -115,15 +115,15 @@ align 4
 ;   codewords of other forth words. DOCOL executes each one of these codewords.
 global DOCOL
 DOCOL:
-            PUSHRSP esi         ; Saves the return point
+            pushrsp esi         ; Saves the return point
             add eax, 4          ; eax pointed to the codeword of this word,
             mov esi, eax        ;   now esi points to the first word
-            NEXT
+            next
 
-; function: EXIT
-;   EXIT is the last word of a defword (a non-defcode word). It restores the 
+; function: exit
+;   exit is the last word of a defword (a non-defcode word). It restores the 
 ;   value of esi, stored in the return stack by DOCOL when this word started.
-defcode EXIT, EXIT, 0
-            POPRSP esi          ; Pops the address of the word to return to
-            NEXT                ; and executes it
+defcode exit, exit, 0
+            poprsp esi          ; Pops the address of the word to return to
+            next                ; and executes it
 

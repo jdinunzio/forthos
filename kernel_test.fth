@@ -11,46 +11,46 @@
 
 [BITS 32]
 : print_scancodes, print_scancodes, 0
-    begin KBD_SCANCODE intprint SPC 0 until
+    begin kbd_scancode intprint spc 0 until
 ;
 
 : print_interrupt, print_interrupt, 0
-    fault PRINTCSTRING CR 
+    fault printcstring cr 
 ;
 
 ; prints an idt entry
 : print_idtentry, print_idtentry, 0
-    DUP 4 + @   SWAP @              # wh wl
-    DUP hi hexprint SPC             # sel
-        lo hexprint SPC             # base lo
-    DUP hi hexprint SPC             # base hi
-        lo 8 SHR hexprint CR        # flags
+    dup 4 + @   swap @              # wh wl
+    dup hi hexprint spc             # sel
+        lo hexprint spc             # base lo
+    dup hi hexprint spc             # base hi
+        lo 8 shr hexprint cr        # flags
 ;
 
 ; test irq
 defcode test_irq, test_irq, 0
     int 33
-    NEXT
+    next
 
 ; divide by zero
 : div_by_zero, div_by_zero, 0
-    2 0 / DROP
+    2 0 / drop
 ;
 
 ; Print hello word
 : print_hello, print_hello, 0
-    hello PRINTCSTRING CR
+    hello printcstring cr
 ;
 
 %define _invoke_addr print_hello
 : test_invoke, test_invoke, 0
-    _invoke_addr EXECUTE
+    _invoke_addr execute
 ;
 
-; function: MAIN
+; function: main
 ;   The first forth word iexecuted by the kernel.
-: MAIN_TEST, MAIN_TEST, 0
-    CLEAR
+: main_test, main_test, 0
+    clear
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry

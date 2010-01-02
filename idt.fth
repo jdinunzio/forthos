@@ -31,63 +31,63 @@ defcode set_idt, set_idt, 0
         pop eax
         shl eax, 8
         mov [ebx+4], ax     ; set flag + 0 byte
-        NEXT
+        next
 
 : idt_set_table, idt_set_table, 0
     0x8E 0x08
-        2DUP isr0    idtable            set_idt
-        2DUP isr1    idtable 8  1 * +   set_idt
-        2DUP isr2    idtable 8  2 * +   set_idt
-        2DUP isr3    idtable 8  3 * +   set_idt
-        2DUP isr4    idtable 8  4 * +   set_idt
-        2DUP isr5    idtable 8  5 * +   set_idt
-        2DUP isr6    idtable 8  6 * +   set_idt
-        2DUP isr7    idtable 8  7 * +   set_idt
-        2DUP isr8    idtable 8  8 * +   set_idt
-        2DUP isr9    idtable 8  9 * +   set_idt
-        2DUP isr10   idtable 8 10 * +   set_idt
-        2DUP isr11   idtable 8 11 * +   set_idt
-        2DUP isr12   idtable 8 12 * +   set_idt
-        2DUP isr13   idtable 8 13 * +   set_idt
-        2DUP isr14   idtable 8 14 * +   set_idt
-        2DUP isr15   idtable 8 15 * +   set_idt
-        2DUP isr16   idtable 8 16 * +   set_idt
-        2DUP isr17   idtable 8 17 * +   set_idt
-        2DUP isr18   idtable 8 18 * +   set_idt
-        2DUP isr19   idtable 8 19 * +   set_idt
-        2DUP isr20   idtable 8 20 * +   set_idt
-        2DUP isr21   idtable 8 21 * +   set_idt
-        2DUP isr22   idtable 8 22 * +   set_idt
-        2DUP isr23   idtable 8 23 * +   set_idt
-        2DUP isr24   idtable 8 24 * +   set_idt
-        2DUP isr25   idtable 8 25 * +   set_idt
-        2DUP isr26   idtable 8 26 * +   set_idt
-        2DUP isr27   idtable 8 27 * +   set_idt
-        2DUP isr28   idtable 8 28 * +   set_idt
-        2DUP isr39   idtable 8 29 * +   set_idt
-        2DUP isr30   idtable 8 30 * +   set_idt
-        2DUP isr31   idtable 8 31 * +   set_idt
-        2DUP isr32   idtable 8 32 * +   set_idt
-        2DUP isr33   idtable 8 33 * +   set_idt
-        2DUP isr34   idtable 8 34 * +   set_idt
-        2DUP isr35   idtable 8 35 * +   set_idt
-        2DUP isr36   idtable 8 36 * +   set_idt
-        2DUP isr37   idtable 8 37 * +   set_idt
-        2DUP isr38   idtable 8 38 * +   set_idt
-        2DUP isr39   idtable 8 39 * +   set_idt
-        2DUP isr40   idtable 8 40 * +   set_idt
-        2DUP isr41   idtable 8 41 * +   set_idt
-        2DUP isr42   idtable 8 42 * +   set_idt
-        2DUP isr43   idtable 8 43 * +   set_idt
-        2DUP isr44   idtable 8 44 * +   set_idt
-        2DUP isr45   idtable 8 45 * +   set_idt
-        2DUP isr46   idtable 8 46 * +   set_idt
+        2dup isr0    idtable            set_idt
+        2dup isr1    idtable 8  1 * +   set_idt
+        2dup isr2    idtable 8  2 * +   set_idt
+        2dup isr3    idtable 8  3 * +   set_idt
+        2dup isr4    idtable 8  4 * +   set_idt
+        2dup isr5    idtable 8  5 * +   set_idt
+        2dup isr6    idtable 8  6 * +   set_idt
+        2dup isr7    idtable 8  7 * +   set_idt
+        2dup isr8    idtable 8  8 * +   set_idt
+        2dup isr9    idtable 8  9 * +   set_idt
+        2dup isr10   idtable 8 10 * +   set_idt
+        2dup isr11   idtable 8 11 * +   set_idt
+        2dup isr12   idtable 8 12 * +   set_idt
+        2dup isr13   idtable 8 13 * +   set_idt
+        2dup isr14   idtable 8 14 * +   set_idt
+        2dup isr15   idtable 8 15 * +   set_idt
+        2dup isr16   idtable 8 16 * +   set_idt
+        2dup isr17   idtable 8 17 * +   set_idt
+        2dup isr18   idtable 8 18 * +   set_idt
+        2dup isr19   idtable 8 19 * +   set_idt
+        2dup isr20   idtable 8 20 * +   set_idt
+        2dup isr21   idtable 8 21 * +   set_idt
+        2dup isr22   idtable 8 22 * +   set_idt
+        2dup isr23   idtable 8 23 * +   set_idt
+        2dup isr24   idtable 8 24 * +   set_idt
+        2dup isr25   idtable 8 25 * +   set_idt
+        2dup isr26   idtable 8 26 * +   set_idt
+        2dup isr27   idtable 8 27 * +   set_idt
+        2dup isr28   idtable 8 28 * +   set_idt
+        2dup isr39   idtable 8 29 * +   set_idt
+        2dup isr30   idtable 8 30 * +   set_idt
+        2dup isr31   idtable 8 31 * +   set_idt
+        2dup isr32   idtable 8 32 * +   set_idt
+        2dup isr33   idtable 8 33 * +   set_idt
+        2dup isr34   idtable 8 34 * +   set_idt
+        2dup isr35   idtable 8 35 * +   set_idt
+        2dup isr36   idtable 8 36 * +   set_idt
+        2dup isr37   idtable 8 37 * +   set_idt
+        2dup isr38   idtable 8 38 * +   set_idt
+        2dup isr39   idtable 8 39 * +   set_idt
+        2dup isr40   idtable 8 40 * +   set_idt
+        2dup isr41   idtable 8 41 * +   set_idt
+        2dup isr42   idtable 8 42 * +   set_idt
+        2dup isr43   idtable 8 43 * +   set_idt
+        2dup isr44   idtable 8 44 * +   set_idt
+        2dup isr45   idtable 8 45 * +   set_idt
+        2dup isr46   idtable 8 46 * +   set_idt
              isr47   idtable 8 47 * +   set_idt
 ;
 
 defcode set_idtr, set_idtr, 0
         lidt [idt_pointer]
-        NEXT
+        next
 
 : idt_init, idt_init, 0
         idt_set_table
@@ -200,13 +200,13 @@ isr4:       isr_wo_error 4      ;  Into Detected Overflow Exception, No
 isr5:       isr_wo_error 5      ;  Out of Bounds Exception, No
 isr6:       isr_wo_error 6      ;  Invalid Opcode Exception, No
 isr7:       isr_wo_error 7      ;  No Coprocessor Exception, No
-isr8:       isr_with_error 8    ;  Double Fault Exception, Yes
+isr8:       isr_with_error 8    ;  Double Fault Exception, yes
 isr9:       isr_wo_error 9      ;  Coprocessor Segment Overrun Exception, No
-isr10:      isr_with_error 10   ;  Bad TSS Exception, Yes
-isr11:      isr_with_error 11   ;  Segment Not Present Exception, Yes
-isr12:      isr_with_error 12   ;  Stack Fault Exception, Yes
-isr13:      isr_with_error 13   ;  General Protection Fault Exception, Yes
-isr14:      isr_with_error 14   ;  Page Fault Exception, Yes
+isr10:      isr_with_error 10   ;  Bad TSS Exception, yes
+isr11:      isr_with_error 11   ;  Segment Not Present Exception, yes
+isr12:      isr_with_error 12   ;  Stack Fault Exception, yes
+isr13:      isr_with_error 13   ;  General Protection Fault Exception, yes
+isr14:      isr_with_error 14   ;  Page Fault Exception, yes
 isr15:      isr_wo_error 15     ;  Unknown Interrupt Exception, No
 isr16:      isr_wo_error 16     ;  Coprocessor Fault Exception, No
 isr17:      isr_wo_error 17     ;  Alignment Check Exception (486+), No

@@ -12,25 +12,25 @@ _start:
 			mov [var_S0], esp 			; Save the initial data stack pointer in FORTH variable S0.
             mov ebp, return_stack_top   ; init the return stack
             mov esi, cold_start         ; fist foth word to exec
-            NEXT
+            next
 
 ; Forth Entry point
 section .rodata
 cold_start:
-            dd MAIN
+            dd main
 
 : test_add, test_add, 0
-    2 2 + DROP
+    2 2 + drop
 ;
 
 
 %define _invoke_addr invoke_addr
 : test_invoke, test_invoke, 0
-    _invoke_addr EXECUTE
+    _invoke_addr execute
 ;
 
-GLOBAL MAIN
-: MAIN, MAIN, 0
+GLOBAL main
+: main, main, 0
     test_invoke
 ;
 

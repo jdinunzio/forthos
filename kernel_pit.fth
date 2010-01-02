@@ -12,7 +12,7 @@
 
 
 : pit_init, pit_init, 0
-    0x43 0x36 OUTB
-    11931800  DUP hi SWAP lo
-        0x40 OUTB   0x40 OUTB
+    0x43 0x36 outb
+    11931800  dup hi swap lo
+        0x40 outb   0x40 outb
 ;

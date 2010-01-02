@@ -9,94 +9,94 @@
 %include "kernel_video.h"
 
 extern keymap
-%define KEYMAP keymap
+%define keymap keymap
 
 [BITS 32]
-%define _KEY_STAT_CAPS 0x01
-%define _KEY_STAT_SHIFT 0x02
+%define _key_stat_caps 0x01
+%define _key_stat_shift 0x02
 
-; variable: KEY_STATUS
-;   Store the status of CAPS, SHIFT and CONTROL keys.
-defvar KEY_STATUS, KEY_STATUS, 0, 0
+; variable: key_status
+;   Store the status of caps, shift and CONTROL keys.
+defvar key_status, key_status, 0, 0
 
-; function: KBD_FLAGS
+; function: kbd_flags
 ;   Returns the keyboard status code.
 ;
 ; Stack:
 ;   -- kbd_status
-: KBD_FLAGS, KBD_FLAGS, 0
-    0x64 INB
+: kbd_flags, kbd_flags, 0
+    0x64 inb
 ;
 
-; function: KBD_BUFFER_FULL
+; function: kbd_buffer_full
 ;   true if there is a scancode waiting to be readed
 ;
 ; Stack:
 ;   -- bool
-: KBD_BUFFER_FULL, KBD_BUFFER_FULL, 0
-    KBD_FLAGS 1 AND
+: kbd_buffer_full, kbd_buffer_full, 0
+    kbd_flags 1 and
 ;
 
-; function: KBD_SCANCODE_NOW
+; function: kbd_scancode_now
 ;   Returns the scancode readed on the keyboard at this moment.
 ;
 ; Stack:
 ;   -- scancode
-: KBD_SCANCODE_NOW, KBD_SCANCODE_NOW, 0
-    0x60 INB
+: kbd_scancode_now, kbd_scancode_now, 0
+    0x60 inb
 ;
 
-; function: KBD_SCANCODE
+; function: kbd_scancode
 ; Waits for a key pressed and returns its sacancode.
 ;
 ; Stack:
 ; -- scancode
-: KBD_SCANCODE, KBD_SCANCODE, 0
-    begin KBD_BUFFER_FULL until
-    KBD_SCANCODE_NOW 0xFF AND
+: kbd_scancode, kbd_scancode, 0
+    begin kbd_buffer_full until
+    kbd_scancode_now 0xFF and
 ;
 
 
-; function _TX_KEY_STATUS
-;   Test and XOR the KEY_STATUS variable.
+; function _tx_key_status
+;   Test and xor the key_status variable.
 ;
-;   If the scancode is equal to the given test, makes an XOR
-;   between KEY_STATUS and flags.
+;   If the scancode is equal to the given test, makes an xor
+;   between key_status and flags.
 ;
 ; stack:
 ;   scancode test flag --
-: _TX_KEY_STATUS, _TX_KEY_STATUS, 0
-    -ROT =
+: _tx_key_status, _tx_key_status, 0
+    -rot =
     if
-        KEY_STATUS @ XOR  KEY_STATUS !
+        key_status @ xor  key_status !
     else
-        DROP
+        drop
     then
 ;
 
-; function: _UPDATE_KEY_STATUS
-;   Updates the KBD_FLAGS variable according with the scancode given.
+; function: _update_key_status
+;   Updates the kbd_flags variable according with the scancode given.
 ;
 ; Stack:
 ;   scancode --
-: _UPDATE_KEY_STATUS, _UPDATE_KEY_STATUS, 0
-    # TODO - XOR could fail in some cases. Set o clear the bit.
-    DUP 58    _KEY_STAT_CAPS  _TX_KEY_STATUS      # CAPS   down
-    DUP 42    _KEY_STAT_SHIFT _TX_KEY_STATUS      # LSHIFT down
-    DUP 170   _KEY_STAT_SHIFT _TX_KEY_STATUS      # LSHIFT up
-    DUP 54    _KEY_STAT_SHIFT _TX_KEY_STATUS      # RSHIFT down
-    DUP 182   _KEY_STAT_SHIFT _TX_KEY_STATUS      # RSHIFT up
+: _update_key_status, _update_key_status, 0
+    # TODO - xor could fail in some cases. Set o clear the bit.
+    dup 58    _key_stat_caps  _tx_key_status      # caps   down
+    dup 42    _key_stat_shift _tx_key_status      # lshift down
+    dup 170   _key_stat_shift _tx_key_status      # lshift up
+    dup 54    _key_stat_shift _tx_key_status      # rshift down
+    dup 182   _key_stat_shift _tx_key_status      # rshift up
 
-    DROP
+    drop
 ;
 
 ; stack:
 ;   scancode -- bool
-: _KEY_DOWN?, _KEY_DOWN, 0
-    0x80 AND 0=
+: _key_down?, _key_down, 0
+    0x80 and 0=
 ;
 
-; function: SC>C (SCANCODE2CHAR)
+; function: sc>c (SCANCODE2CHAR)
 ;   Converts a scancode to an ASCII character.
 ; 
 ;   If the scancode correspond to keyup or to a non-character
@@ -104,24 +104,24 @@ defvar KEY_STATUS, KEY_STATUS, 0, 0
 ;
 ; stack:
 ;   scancode -- char
-: SC>C, SCANCODE2CHAR, 0
-    DUP _KEY_DOWN? if
-        4 *   KEY_STATUS @  +  KEYMAP + C@
+: sc>c, scancode2char, 0
+    dup _key_down? if
+        4 *   key_status @  +  keymap + c@
     else 0 then
 ;
 
-; function: GETCHAR
+; function: getchar
 ;   Waits for a key to be pressed and then returns its ASCII code.
 ;
 ; Stack:
 ;   -- c
-: GETCHAR, GETCHAR, 0
+: getchar, getchar, 0
     0
     begin
-        DROP
-        KBD_SCANCODE 
-        DUP _UPDATE_KEY_STATUS
-        SC>C DUP
+        drop
+        kbd_scancode 
+        dup _update_key_status
+        sc>c dup
     until
 ;
 

@@ -32,13 +32,13 @@ defcode irq_init, irq_init, 0
         out 0x21, al
         out 0xA1, al
 
-        ; TEST - Disable all interrupts but keyboard and clock
+        ; test - Disable all interrupts but keyboard and clock
         mov al, 0xfc
         out 0x21, al
         mov al, 0xff
         out 0xa1, al
         sti
-        NEXT
+        next
 
 ; function: isr_info
 ;   Returns the isr id and isr error code
@@ -50,17 +50,17 @@ defcode isr_info, isr_info, 0
     push eax
     mov eax, [esp + 64]
     push eax
-    NEXT
+    next
 
 ; function: irq_handler
 ;   Handles all interruptions
 : irq_handler, irq_handler, 0
-   _irqmsg PRINTCSTRING
-   isr_info  intprint SPC    intprint  
-   _irqmsg2 PRINTCSTRING CR
-    # FIXME - unconditional clean
-    0x20 0xA0 OUTB
-    0x20 0x20 OUTB
+   _irqmsg printcstring
+   isr_info  intprint spc    intprint  
+   _irqmsg2 printcstring cr
+    # FIxME - unconditional clean
+    0x20 0xA0 outb
+    0x20 0x20 outb
 ;
 
 section .rodata

@@ -76,7 +76,7 @@ def translate_lines(fin, fout):
     '''
     for line in fin:
         if line.startswith(';'):
-            fout.write('        dd EXIT\n')
+            fout.write('        dd exit\n')
             return
 
         code, comment = (line.split('#') + [None])[:2]
@@ -119,10 +119,10 @@ def tr_lit_n(word):
     Translate a literal integer.
     '''
     if word.startswith('0x') or word.startswith('0X'):
-        return 'LITN %s' % word
+        return 'litn %s' % word
     try:
         int(word)
-        return 'LITN %s' % word
+        return 'litn %s' % word
     except:
         return ''
 
@@ -132,7 +132,7 @@ def tr_lit_s(word):
     Translate a literal character.
     '''
     if word.startswith("'"):
-        return 'LITN %s' % word
+        return 'litn %s' % word
     else:
         return ''
 
@@ -142,7 +142,7 @@ def tr_lit_lit(word):
     Translate a literal defined by a %define macro.
     '''
     if word in LITERALS:
-        return 'LITN %s' % word
+        return 'litn %s' % word
     else:
         return ''
 
