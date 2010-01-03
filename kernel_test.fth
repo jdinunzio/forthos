@@ -8,10 +8,15 @@
 %include "kernel_words.h"
 %include "kernel_video.h"
 %include "kernel_kbd.h"
+%include "irq.h"
 
 [BITS 32]
+: print_scancode, print_scancode, 0
+    kbd_scancode intprint spc
+;
+
 : print_scancodes, print_scancodes, 0
-    begin kbd_scancode intprint spc 0 until
+    begin print_scancode 0 until
 ;
 
 : print_interrupt, print_interrupt, 0
@@ -49,14 +54,13 @@ defcode test_irq, test_irq, 0
 
 ; function: main
 ;   The first forth word iexecuted by the kernel.
+%define _print_scancode print_scancode
 : main_test, main_test, 0
     clear
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
-    # print_hello
-    #test_invoke
-    print_scancodes
+    _print_scancode 33 register_isr_handler
 ;
 
 section .rodata

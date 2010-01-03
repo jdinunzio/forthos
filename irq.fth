@@ -44,7 +44,7 @@ defcode irq_init, irq_init, 0
 ;   Returns the isr id and isr error code
 ;
 ; stack:
-;  {isr info} -- isr_no isr_err
+;  {isr info} -- {isr info} isr_no isr_err
 defcode isr_info, isr_info, 0
     mov eax, [esp + 64]
     push eax
@@ -54,15 +54,28 @@ defcode isr_info, isr_info, 0
 
 ; function: irq_handler
 ;   Handles all interruptions
+;
+; stack:
+;   {isr info} -- {isr info}
 : irq_handler, irq_handler, 0
-   _irqmsg printcstring
-   isr_info  intprint spc    intprint  
-   _irqmsg2 printcstring cr
-    # FIxME - unconditional clean
+    isr_info swap drop  4 * isr_table + @
+    dup 0<> if execute else drop then
+
+    # FIXME - unconditional clean
     0x20 0xA0 outb
     0x20 0x20 outb
 ;
 
-section .rodata
-irqmsg: db "The interrupt (", 0
-irqmsg2: db ") has been fired", 0
+; function: register_isr_handler
+;   Register a handler for an irq.
+;
+; stack:
+;   addr i --
+: register_isr_handler, register_isr_handler, 0
+    4 *  isr_table + !
+;
+
+section .data
+; table: isr_table
+;   Table of the routines that handle an isr
+isr_table: times 48 dq 0

@@ -35,6 +35,7 @@ extern idt_init
     pit_init
     irq_init
     main_test
+    stop
 ;
 
 

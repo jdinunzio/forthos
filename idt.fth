@@ -234,9 +234,9 @@ isr30:      isr_wo_error 30     ; Reserved
 isr31:      isr_wo_error 31     ; Reserved
 
 ; Interruptions
-isr32:      irq_wo_error 32
-isr33:      irq_wo_error 33
-isr34:      irq_wo_error 34
+isr32:      irq_wo_error 32     ; PIT timer
+isr33:      irq_wo_error 33     ; Keyboard
+isr34:      irq_wo_error 34     ; PIT beep
 isr35:      irq_wo_error 35
 isr36:      irq_wo_error 36
 isr37:      irq_wo_error 37
