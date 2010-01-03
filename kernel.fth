@@ -32,7 +32,7 @@ extern irq_init
 extern idt_init
 : main_kernel, main_kernel, 0
     idt_init
-    pit_init
+    1 pit_init
     irq_init
     main_test
     stop

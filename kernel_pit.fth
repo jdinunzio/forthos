@@ -10,9 +10,14 @@
 %include "forth.h"
 %include "kernel_words.h"
 
-
+; function: pit_init
+;   Initializes the PIT clock
+;
+; stack:
+;   f --
 : pit_init, pit_init, 0
-    0x43 0x36 outb
-    11931800  dup hi swap lo
-        0x40 outb   0x40 outb
+    1193180 swap / dup hi swap lo
+    0x36 0x43 outb
+         0x40 outb   
+         0x40 outb
 ;

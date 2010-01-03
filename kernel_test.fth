@@ -15,6 +15,10 @@
     kbd_scancode intprint spc
 ;
 
+: print_tic, print_tic, 0
+    tic_msg printcstring cr
+;
+
 : print_scancodes, print_scancodes, 0
     begin print_scancode 0 until
 ;
@@ -55,15 +59,17 @@ defcode test_irq, test_irq, 0
 ; function: main
 ;   The first forth word iexecuted by the kernel.
 %define _print_scancode print_scancode
+%define _print_tic print_tic
 : main_test, main_test, 0
     clear
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
     _print_scancode 33 register_isr_handler
+    # _print_tic      32 register_isr_handler
 ;
 
 section .rodata
-hello:  db "hello, world", 0
-fault:  db "A fault happened", 0
-
+hello:      db "hello, world", 0
+fault:      db "A fault happened", 0
+tic_msg:    db "The clock tics", 0
