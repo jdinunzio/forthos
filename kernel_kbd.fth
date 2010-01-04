@@ -80,12 +80,12 @@ defvar key_status, key_status, 0, 0
 ; Stack:
 ;   scancode --
 : _update_key_status, _update_key_status, 0
-    # TODO - xor could fail in some cases. Set o clear the bit.
-    dup 58    _key_stat_caps  _tx_key_status      # caps   down
-    dup 42    _key_stat_shift _tx_key_status      # lshift down
-    dup 170   _key_stat_shift _tx_key_status      # lshift up
-    dup 54    _key_stat_shift _tx_key_status      # rshift down
-    dup 182   _key_stat_shift _tx_key_status      # rshift up
+    ; TODO - xor could fail in some cases. Set o clear the bit.
+    dup 58    _key_stat_caps  _tx_key_status      ; caps   down
+    dup 42    _key_stat_shift _tx_key_status      ; lshift down
+    dup 170   _key_stat_shift _tx_key_status      ; lshift up
+    dup 54    _key_stat_shift _tx_key_status      ; rshift down
+    dup 182   _key_stat_shift _tx_key_status      ; rshift up
 
     drop
 ;

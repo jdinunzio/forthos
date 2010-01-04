@@ -49,13 +49,13 @@ defvar screen_color, screen_color, 0, 0x0f00
 ; Stack:
 ;   --
 : at_hw, at_hw, 0
-    cursor_pos_rel          # Get the position of the cursor
-    14 0x3D4 outb           # Say you're going to send the high byte
-    dup   1 n_byte          # ... get the higer byte
-    0x3D5 outb              # ... and send it
+    cursor_pos_rel          ; Get the position of the cursor
+    14 0x3D4 outb           ; Say you're going to send the high byte
+    dup   1 n_byte          ; ... get the higer byte
+    0x3D5 outb              ; ... and send it
 
-    15 0x3D4 outb           # Say you're going to send the low bye
-      0x3D5 outb            # ... and send it
+    15 0x3D4 outb           ; Say you're going to send the low bye
+      0x3D5 outb            ; ... and send it
 ;
 
 ; function: atx
@@ -114,7 +114,7 @@ defcode bg, bg, 0
 ;   --
 : screen_scroll, screen_scroll, 0
     screen   dup 160 +   swap   3840 cmove
-    # TODO - Clean last line, move cursor
+    ; TODO - Clean last line, move cursor
     _clean_last_line
 ;
 
@@ -229,7 +229,7 @@ defcode c>cw, char_to_charword, 0
 ; Stack:
 ;   --
 : tab, tab, 0
-    # TODO - Move to the next column multiple of 8
+    ; TODO - Move to the next column multiple of 8
     8 cursor_pos_x +! at_hw
 ;
 

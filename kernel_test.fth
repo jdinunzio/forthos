@@ -29,11 +29,11 @@
 
 ; prints an idt entry
 : print_idtentry, print_idtentry, 0
-    dup 4 + @   swap @              # wh wl
-    dup hi hexprint spc             # sel
-        lo hexprint spc             # base lo
-    dup hi hexprint spc             # base hi
-        lo 8 shr hexprint cr        # flags
+    dup 4 + @   swap @              ; wh wl
+    dup hi hexprint spc             ; sel
+        lo hexprint spc             ; base lo
+    dup hi hexprint spc             ; base hi
+        lo 8 shr hexprint cr        ; flags
 ;
 
 ; test irq
@@ -65,8 +65,9 @@ defcode test_irq, test_irq, 0
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
-    _print_scancode 33 register_isr_handler
-    # _print_tic      32 register_isr_handler
+    ;_print_scancode 33 register_isr_handler
+    [`] print_scancode 33 register_isr_handler
+    ; _print_tic      32 register_isr_handler
 ;
 
 section .rodata

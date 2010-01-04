@@ -61,7 +61,7 @@ defcode isr_info, isr_info, 0
     isr_info swap drop  4 * isr_table + @
     dup 0<> if execute else drop then
 
-    # FIXME - unconditional clean
+    ; FIXME - unconditional clean
     0x20 0xA0 outb
     0x20 0x20 outb
 ;
