@@ -16,7 +16,9 @@
 ; stack:
 ;   f --
 : pit_init, pit_init, 0
-    1193180 swap / dup hi swap lo
+    1193180 swap /      ( calculates our divisor )
+    dup  1 n_byte       ( get byte1 of divisor )
+    swap 0 n_byte       ( get byte0 of divisor )
     0x36 0x43 outb
          0x40 outb   
          0x40 outb

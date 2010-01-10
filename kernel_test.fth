@@ -15,8 +15,12 @@
     kbd_scancode intprint spc
 ;
 
+defvar tic_count, tic_count, 0, 0
 : print_tic, print_tic, 0
-    tic_msg printcstring cr
+    1 tic_count +!
+    tic_count @ 100 mod 0= if
+      tic_msg printcstring cr
+    then
 ;
 
 : print_scancodes, print_scancodes, 0
@@ -57,17 +61,14 @@ defcode test_irq, test_irq, 0
 ;
 
 ; function: main
-;   The first forth word iexecuted by the kernel.
-%define _print_scancode print_scancode
-%define _print_tic print_tic
+;   The first forth word executed by the kernel.
 : main_test, main_test, 0
     clear
     0x101006 print_idtentry
     0x10100E print_idtentry
     0x101016 print_idtentry
-    ;_print_scancode 33 register_isr_handler
     [`] print_scancode 33 register_isr_handler
-    ; _print_tic      32 register_isr_handler
+    [`] print_tic      32 register_isr_handler
 ;
 
 section .rodata
