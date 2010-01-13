@@ -3,6 +3,6 @@
 grep '^defvar' $1 | cut -d ',' -f 2 | sed -e 's/ */var_/' >  $1.tmp
 grep '^def' $1    | cut -d ',' -f 2 | sed -e 's/ *//'     >> $1.tmp
 grep '^def' $1    | cut -d ' ' -f 2 | cut -d ',' -f 1     >> $1.tmp
-sort -u $1.tmp | awk  '/^[A-Za-z_][A-Za-Z_0-9]*$$/ {print "extern " $$0}' > ${1%.s}.h
+sort -u $1.tmp | awk  ' /^[[:alpha:]_][[:alnum:]_]*$/{print "extern " $$0}' > ${1%.s}.h
 rm $1.tmp
 
